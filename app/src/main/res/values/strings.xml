@@ -4,4 +4,8 @@
     <string name="tab_text_2">History</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="new_task">New Task:</string>
+    <string name="ok">OK</string>
+    <string name="cancel">CANCEL</string>
+    <string name="list_empty_text">There are no Tasks to display. \nGet started by creating a new Task!</string>
 </resources>
