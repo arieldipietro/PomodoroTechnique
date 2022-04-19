@@ -8,6 +8,7 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import com.example.pomodorotechnique.FragmentHistory
 import com.example.pomodorotechnique.R
 import com.example.pomodorotechnique.databinding.FragmentMainBinding
 
@@ -28,6 +29,7 @@ class PlaceholderFragment : Fragment() {
         pageViewModel = ViewModelProvider(this).get(PageViewModel::class.java).apply {
             setIndex(arguments?.getInt(ARG_SECTION_NUMBER) ?: 1)
         }
+
     }
 
     override fun onCreateView(

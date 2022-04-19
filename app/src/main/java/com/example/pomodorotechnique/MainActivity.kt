@@ -19,6 +19,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private val viewModel = TimerViewModel()
 
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -38,6 +40,8 @@ class MainActivity : AppCompatActivity() {
         }
 
     }
+
+
 
 
 }

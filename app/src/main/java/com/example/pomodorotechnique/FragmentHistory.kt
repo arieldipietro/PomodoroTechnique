@@ -1,12 +1,13 @@
 package com.example.pomodorotechnique
 
+import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.ViewModelProvider
 import com.example.pomodorotechnique.databinding.FragmentHistoryBinding
 import com.example.pomodorotechnique.databinding.IndividualTaskViewBinding
 
@@ -14,7 +15,29 @@ class FragmentHistory : Fragment() {
 
     private lateinit var binding: FragmentHistoryBinding
     private lateinit var taskListContainer: ViewGroup
-    private lateinit var tasksViewModel: TasksViewModel
+    private val tasksViewModel = TasksViewModel()
+    //private val tasksViewModel = TasksViewModel() by activityViewModels()
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        Log.i("MainActivity", "OnAttach Called")
+    }
+
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        Log.i("MainActivity", "OnCreate Called")
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        Log.i("MainActivity", "onViewCreated Called")
+    }
+
+    override fun onStart() {
+        super.onStart()
+        Log.i("MainActivity", "onStart Called")
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -30,14 +53,13 @@ class FragmentHistory : Fragment() {
 
         taskListContainer = binding.tasksListContainer
 
-        tasksViewModel = ViewModelProvider(requireActivity()).get(TasksViewModel::class.java)
-
-
         //Checks if the list has some items, otherwise displays a message
         checkTasksList()
 
         tasksViewModel.tasksListData.observe(viewLifecycleOwner,{
-            for (item in it) {
+            for (item in tasksViewModel.tasksList) {
+
+                Log.i("MainActivity", "Observer called")
 
                 val view: IndividualTaskViewBinding = DataBindingUtil.inflate(
                     inflater, R.layout.individual_task_view, container, false
@@ -51,9 +73,8 @@ class FragmentHistory : Fragment() {
             }
 
             checkTasksList()
+            Log.i("MainActivity", "OncreateView Called")
         })
-
-        setHasOptionsMenu(true)
 
         return binding.root
     }
@@ -66,5 +87,14 @@ class FragmentHistory : Fragment() {
         }
     }
 
+    override fun onPause() {
+        super.onPause()
+        Log.i("MainActivity", "onPause Called")
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Log.i("MainActivity", "On resume called")
+    }
 }
 

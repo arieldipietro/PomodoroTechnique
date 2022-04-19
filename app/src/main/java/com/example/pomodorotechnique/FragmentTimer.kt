@@ -1,5 +1,6 @@
 package com.example.pomodorotechnique
 
+import android.app.Activity
 import android.os.Bundle
 import android.text.InputType
 import android.util.Log
@@ -20,9 +21,10 @@ import java.util.*
 class FragmentTimer : Fragment() {
 
     private lateinit var binding : FragmentTimerBinding
-    private var task = Task("","",0,0L,0L)
+    //private var task = Task("","",0,0L,0L)
     private val timerViewModel = TimerViewModel()
-    private val taskViewModel = TasksViewModel()
+    private val tasksViewModel = TasksViewModel()
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -90,7 +92,7 @@ class FragmentTimer : Fragment() {
         binding.textViewState.text = "Cycle: $cycleString - $stateString"
     }
     
-    fun createNewTask(name:String){
+    /*fun createNewTask(name:String) : Task{
         task.name = name
         val c = Calendar.getInstance()
         val year = c.get(Calendar.YEAR)
@@ -100,20 +102,21 @@ class FragmentTimer : Fragment() {
         task.dateCreated = "Date created: $day/$month/$year"
 
         //Alternative method for getting the date
-        /*val current = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        *//*val current = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             LocalDateTime.now()
         } else {
             TODO("VERSION.SDK_INT < O")
         }
 
         val formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM)
-        val formatted = current.format(formatter)*/
-        
+        val formatted = current.format(formatter)*//*
+
         task.cyclesCompleted = timerViewModel.cyclesCount
         task.focusedTime = timerViewModel.cyclesCount *25L
         task.restTime = 10L
         //TODO: Create the focus time
-    }
+        return task
+    }*/
 
     fun showAlertDialog(){
         val inputTaskName = EditText(context)
@@ -123,11 +126,13 @@ class FragmentTimer : Fragment() {
             .setTitle(R.string.new_task)
             .setView(inputTaskName)
             .setPositiveButton(R.string.ok){dialog, switch ->
-                createNewTask(inputTaskName.text.toString())
-                taskViewModel.addNewTask(task)
-                Snackbar.make(binding.root, "name: ${task.name}, ${task.dateCreated}", Snackbar.LENGTH_SHORT).show()
-                Snackbar.make(binding.root, taskViewModel.tasksList.size.toString(), Snackbar.LENGTH_SHORT).show()
-                Log.i("MainActivity", "ListData ${taskViewModel.tasksListData.value}")
+                var newTask = tasksViewModel.createNewTask(inputTaskName.text.toString())
+                newTask.cyclesCompleted = timerViewModel.cyclesCount
+                newTask.focusedTime = timerViewModel.cyclesCount *25L
+                newTask.restTime = 10L
+                Snackbar.make(binding.root, "name: ${newTask.name}, ${newTask.dateCreated}", Snackbar.LENGTH_SHORT).show()
+                Snackbar.make(binding.root, tasksViewModel.tasksList.size.toString(), Snackbar.LENGTH_SHORT).show()
+                Log.i("MainActivity", "ListData ${tasksViewModel.tasksListData.value}")
             }
             .setNegativeButton(R.string.cancel){dialog, switch ->
                 //TODO: Implement cancel button
