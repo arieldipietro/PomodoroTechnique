@@ -8,9 +8,12 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.viewpager.widget.ViewPager
+import androidx.viewpager2.widget.ViewPager2
 import com.example.pomodorotechnique.FragmentHistory
 import com.example.pomodorotechnique.R
 import com.example.pomodorotechnique.databinding.FragmentMainBinding
+import com.google.android.material.tabs.TabLayoutMediator
 
 /**
  * A placeholder fragment containing a simple view.

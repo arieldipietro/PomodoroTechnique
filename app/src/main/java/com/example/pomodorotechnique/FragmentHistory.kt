@@ -2,42 +2,21 @@ package com.example.pomodorotechnique
 
 import android.content.Context
 import android.os.Bundle
+import android.text.Layout
 import android.util.Log
+import android.view.*
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.ViewModelProvider
 import com.example.pomodorotechnique.databinding.FragmentHistoryBinding
 import com.example.pomodorotechnique.databinding.IndividualTaskViewBinding
 
 class FragmentHistory : Fragment() {
 
-    private lateinit var binding: FragmentHistoryBinding
-    private lateinit var taskListContainer: ViewGroup
-    private val tasksViewModel = TasksViewModel()
-    //private val tasksViewModel = TasksViewModel() by activityViewModels()
+    private lateinit var binding : FragmentHistoryBinding
+    private lateinit var tasksListContainer : ViewGroup
+    private lateinit var tasksViewModel : TasksViewModel
 
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        Log.i("MainActivity", "OnAttach Called")
-    }
-
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        Log.i("MainActivity", "OnCreate Called")
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        Log.i("MainActivity", "onViewCreated Called")
-    }
-
-    override fun onStart() {
-        super.onStart()
-        Log.i("MainActivity", "onStart Called")
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -51,50 +30,69 @@ class FragmentHistory : Fragment() {
             false
         )
 
-        taskListContainer = binding.tasksListContainer
+        tasksListContainer = binding.tasksListContainer
+
+        tasksViewModel = ViewModelProvider(requireActivity()).get(TasksViewModel::class.java)
 
         //Checks if the list has some items, otherwise displays a message
         checkTasksList()
 
         tasksViewModel.tasksListData.observe(viewLifecycleOwner,{
-            for (item in tasksViewModel.tasksList) {
-
-                Log.i("MainActivity", "Observer called")
-
-                val view: IndividualTaskViewBinding = DataBindingUtil.inflate(
-                    inflater, R.layout.individual_task_view, container, false
-                )
-
-                view.taskTitle.text = item.name
-                view.taskDateCreated.text = item.dateCreated
-                view.taskTertiaryText.text = item.cyclesCompleted.toString()
-
-                taskListContainer.addView(view.root)
-            }
-
-            checkTasksList()
-            Log.i("MainActivity", "OncreateView Called")
+            updateUI()
         })
+
+        setHasOptionsMenu(true)
 
         return binding.root
     }
 
+    override fun onResume() {
+        super.onResume()
+        updateUI()
+    }
+
+    //overflow menu
+    /*override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater?.inflate(R.menu.overflow_menu, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return NavigationUI.onNavDestinationSelected(item!!, requireView().findNavController())
+        super.onOptionsItemSelected(item)
+    }*/
+
     private fun checkTasksList(){
-        if(taskListContainer.childCount == 0 ){
+        if(tasksListContainer.childCount == 0 ){
             binding.emptyListText.setVisibility(View.VISIBLE)
         } else{
             binding.emptyListText.setVisibility(View.GONE)
         }
+
     }
 
-    override fun onPause() {
-        super.onPause()
-        Log.i("MainActivity", "onPause Called")
+    fun updateUI(){
+        val inflater = LayoutInflater.from(context)
+
+        tasksListContainer.removeAllViews()
+
+        for (item in tasksViewModel.tasksList) {
+            val view: IndividualTaskViewBinding = DataBindingUtil.inflate(
+                inflater, R.layout.individual_task_view, tasksListContainer, false
+            )
+
+            view.taskTitle.text = item.name
+            view.taskDateCreated.text = getString(R.string.task_date_created)+" "+item.dateCreated
+            view.taskCyclesCompleted.text = getString(R.string.task_cycles_completed) +" "+item.cyclesCompleted.toString()
+
+            tasksListContainer.addView(view.root)
+        }
+
+        checkTasksList()
     }
 
-    override fun onResume() {
-        super.onResume()
-        Log.i("MainActivity", "On resume called")
-    }
+
+
+
+
 }
-
