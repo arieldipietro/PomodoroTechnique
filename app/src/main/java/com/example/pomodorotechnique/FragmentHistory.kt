@@ -1,8 +1,6 @@
 package com.example.pomodorotechnique
 
-import android.content.Context
 import android.os.Bundle
-import android.text.Layout
 import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
@@ -10,12 +8,14 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import com.example.pomodorotechnique.databinding.FragmentHistoryBinding
 import com.example.pomodorotechnique.databinding.IndividualTaskViewBinding
+import com.example.pomodorotechnique.models.Task
 
 class FragmentHistory : Fragment() {
 
     private lateinit var binding : FragmentHistoryBinding
     private lateinit var tasksListContainer : ViewGroup
     private lateinit var tasksViewModel : TasksViewModel
+    private lateinit var currentTask : Task
 
 
     override fun onCreateView(
@@ -34,11 +34,19 @@ class FragmentHistory : Fragment() {
 
         tasksViewModel = ViewModelProvider(requireActivity()).get(TasksViewModel::class.java)
 
+
+        if(tasksViewModel.currentTasksList.isNotEmpty()) {
+            currentTask = tasksViewModel.currentTasksList[0]
+        }
+        /*else{
+            temporaryFirstTask
+        }*/
+
         //Checks if the list has some items, otherwise displays a message
-        checkTasksList()
+        checkCurrentTasksList()
 
         tasksViewModel.tasksListData.observe(viewLifecycleOwner,{
-            updateUI()
+                updateHistoryUI()
         })
 
         setHasOptionsMenu(true)
@@ -48,7 +56,14 @@ class FragmentHistory : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        updateUI()
+        Log.i("MainActivity","Fragment history on resume called")
+        Log.i("MainActivity","currentTaskList: ${tasksViewModel.currentTasksList}")
+        if(tasksViewModel.currentTasksList.isNotEmpty()) {
+            currentTaskNotEmpty()
+            currentTask = tasksViewModel.currentTasksList[0]
+            updateCurrentTaskUI()
+        }
+
     }
 
     //overflow menu
@@ -62,16 +77,30 @@ class FragmentHistory : Fragment() {
         super.onOptionsItemSelected(item)
     }*/
 
-    private fun checkTasksList(){
-        if(tasksListContainer.childCount == 0 ){
-            binding.emptyListText.setVisibility(View.VISIBLE)
+    private fun checkCurrentTasksList(){
+        if(tasksViewModel.currentTasksList.isEmpty()){
+            currentTaskEmpty()
         } else{
-            binding.emptyListText.setVisibility(View.GONE)
+            currentTaskNotEmpty()
         }
-
     }
 
-    fun updateUI(){
+    private fun currentTaskEmpty(){
+        binding.emptyListText.setVisibility(View.VISIBLE)
+        binding.currentTaskText.setVisibility(View.GONE)
+        binding.historyTasksText.setVisibility(View.GONE)
+        binding.currentTaskContainer.setVisibility(View.GONE)
+    }
+
+    private fun currentTaskNotEmpty(){
+        binding.emptyListText.setVisibility(View.GONE)
+        binding.currentTaskText.setVisibility(View.VISIBLE)
+        binding.historyTasksText.setVisibility(View.VISIBLE)
+        binding.currentTaskContainer.setVisibility(View.VISIBLE)
+        currentTask = tasksViewModel.currentTasksList[0]
+    }
+
+    fun updateHistoryUI(){
         val inflater = LayoutInflater.from(context)
 
         tasksListContainer.removeAllViews()
@@ -87,11 +116,13 @@ class FragmentHistory : Fragment() {
 
             tasksListContainer.addView(view.root)
         }
-
-        checkTasksList()
     }
 
-
+    fun updateCurrentTaskUI(){
+        binding.currentTaskTitle.text = currentTask.name
+        binding.currentTaskDateCreated.text = getString(R.string.task_date_created)+" "+currentTask.dateCreated.toString()
+        binding.currentTaskCyclesCompleted.text = getString(R.string.task_cycles_completed) +" "+currentTask.cyclesCompleted.toString()
+    }
 
 
 

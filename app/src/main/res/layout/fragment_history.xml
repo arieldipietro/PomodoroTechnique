@@ -7,6 +7,7 @@
 
     <!-- using constraint layout so I can have the views floating in the screen-->
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraint_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -18,26 +19,107 @@
             android:text="@string/list_empty_text"
             android:textAlignment="center"
             android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="@+id/scrollView"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/scrollView" />
+            app:layout_constraintTop_toTopOf="parent" />
 
+        <TextView
+            android:id="@+id/current_task_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Current Task"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/current_task_container"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.0" />
+
+        <RelativeLayout
+            android:id="@+id/current_task_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="?attr/selectableItemBackground"
+            android:minHeight="88dp"
+            app:layout_constraintEnd_toEndOf="@+id/scrollView"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/current_task_text"
+            >
+
+            <ImageView
+                android:id="@+id/task_item_icon"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_alignParentStart="true"
+                android:paddingTop="8dp"
+                app:srcCompat="@drawable/tomato" />
+
+            <TextView
+                android:id="@+id/current_task_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_toEndOf="@id/task_item_icon"
+                android:maxLines="1"
+                android:paddingTop="16dp"
+                android:paddingEnd="16dp"
+                android:textAppearance="?attr/textAppearanceSubtitle1"
+                tools:text="Title" />
+
+            <TextView
+                android:id="@+id/current_task_date_created"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/current_task_title"
+                android:layout_gravity="center_vertical"
+                android:layout_toEndOf="@id/task_item_icon"
+                android:maxLines="1"
+                android:paddingEnd="16dp"
+                android:textAppearance="?attr/textAppearanceBody2"
+                tools:text="Date created" />
+
+            <TextView
+                android:id="@+id/current_task_cycles_completed"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/current_task_date_created"
+                android:layout_gravity="center_vertical"
+                android:layout_toEndOf="@id/task_item_icon"
+                android:maxLines="1"
+                android:paddingEnd="16dp"
+                android:textAppearance="?attr/textAppearanceBody2"
+                tools:text="task_tertiary_text" />
+
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/history_tasks_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="History"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/current_task_container"
+            app:layout_constraintVertical_bias="0.0" />
 
         <ScrollView
             android:id="@+id/scrollView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="16dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="1.0">
+            app:layout_constraintTop_toBottomOf="@+id/history_tasks_text"
+            app:layout_constraintVertical_bias="0.0">
 
             <LinearLayout
                 android:id="@+id/tasks_list_container"

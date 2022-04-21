@@ -1,6 +1,7 @@
 package com.example.pomodorotechnique
 
 import android.app.Activity
+import android.opengl.Visibility
 import android.os.Bundle
 import android.text.InputType
 import android.util.Log
@@ -19,6 +20,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import java.util.*
+import kotlin.concurrent.timer
 
 
 class FragmentTimer : Fragment() {
@@ -47,12 +49,15 @@ class FragmentTimer : Fragment() {
         task = Task("","",0,0L,0L)
         binding.task = task
 
-        //TODO: ELIMINAR VISIBILIDAD DE LOS BOTONES
-        if(tasksViewModel.tasksList.size == 0){
-            currentTask = Task("","",0,0L,0L)
+        if(::currentTask.isInitialized) {
+            binding.buttonPlay.setVisibility(View.VISIBLE)
+            binding.buttonPause.setVisibility(View.VISIBLE)
+            binding.imageButton3.setVisibility(View.VISIBLE)
         }
         else{
-            currentTask = tasksViewModel.getCurrentTask()
+            binding.buttonPlay.setVisibility(View.GONE)
+            binding.buttonPause.setVisibility(View.GONE)
+            binding.imageButton3.setVisibility(View.GONE)
         }
 
         binding.buttonPlay.setOnClickListener{ v ->
@@ -102,13 +107,8 @@ class FragmentTimer : Fragment() {
         }
 
     private fun updateUIText() {
-        var cycleString: String = when (timerViewModel.cyclesCount) {
-            0 -> "1"
-            1 -> "2"
-            2 -> "3"
-            3 -> "4"
-            else -> "5"
-        }
+        var cycleString: String = (timerViewModel.cyclesCount+1).toString()
+
         var stateString: String =
             when (timerViewModel.timerState.value) {
                 TimerState.Completed -> "Press play to start a new cycle!"
@@ -134,16 +134,41 @@ class FragmentTimer : Fragment() {
             .setTitle(R.string.new_task)
             .setView(inputTaskName)
             .setPositiveButton(R.string.ok){dialog, switch ->
-                var newTask = tasksViewModel.createNewTask(inputTaskName.text.toString())
-                newTask.cyclesCompleted = 0
-                newTask.focusedTime = 0L
-                newTask.restTime = 0L
-                timerViewModel.updateCurrentTaskState(currentTask)
-                tasksViewModel.addNewTask(newTask)
-                //oldTask = tasksViewModel.tasksList[1]
-                timerViewModel.onReset()
-                currentTask = tasksViewModel.getCurrentTask()
-                Log.i("MainActivity", "ListData ${tasksViewModel.tasksListData.value}")
+
+                if(::currentTask.isInitialized) {
+                    timerViewModel.updateCurrentTaskState(currentTask)
+                    tasksViewModel.addTaskToHistory(currentTask)
+
+                    var newTask = tasksViewModel.createNewTask(inputTaskName.text.toString())
+                    newTask.cyclesCompleted = 0
+                    newTask.focusedTime = 0L
+                    newTask.restTime = 0L
+
+                    currentTask = newTask
+                    //esto para pasar el task al otro fragment. dsps cuando ingrese uno nuevo tengo que limpiar la lista
+                    tasksViewModel.addCurrentTask(currentTask)
+
+                    timerViewModel.onReset()
+
+                    Log.i("MainActivity", "ListData ${tasksViewModel.tasksListData.value}")
+                }
+                else{
+                    var newTask = tasksViewModel.createNewTask(inputTaskName.text.toString())
+                    newTask.cyclesCompleted = 0
+                    newTask.focusedTime = 0L
+                    newTask.restTime = 0L
+
+                    currentTask = newTask
+                    //esto para pasar el task al otro fragment. dsps cuando ingrese uno nuevo tengo que limpiar la lista
+                    tasksViewModel.addCurrentTask(currentTask)
+
+                    timerViewModel.onReset()
+
+                    Log.i("MainActivity", "current task view model ${tasksViewModel.currentTasksList}")
+                }
+                binding.buttonPlay.setVisibility(View.VISIBLE)
+                binding.buttonPause.setVisibility(View.VISIBLE)
+                binding.imageButton3.setVisibility(View.VISIBLE)
             }
             .setNegativeButton(R.string.cancel){dialog, switch ->
                 //TODO: Implement cancel button
