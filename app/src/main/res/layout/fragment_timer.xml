@@ -16,14 +16,20 @@
     tools:ignore="MissingPrefix">
 
 
-    <!-- TODO: Update blank fragment layout -->
-
-    <com.example.pomodorotechnique.CanvasDrawings
+    <com.example.pomodorotechnique.canvasdrawings.CanvasDrawings
         android:id="@+id/canvasDrawings"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:layout_editor_absoluteX="1dp"
         tools:layout_editor_absoluteY="0dp" />
+
+    <!--<com.example.pomodorotechnique.canvasdrawings.Animations
+        android:id="@+id/animations"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:layout_editor_absoluteX="1dp"
+        tools:layout_editor_absoluteY="0dp" />-->
+
 
     <ImageButton
         android:id="@+id/button_play"

@@ -1,36 +1,48 @@
 package com.example.pomodorotechnique
 
-import android.app.Activity
-import android.opengl.Visibility
+
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
+import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
 import android.text.InputType
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
+import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.SavedStateViewModelFactory
 import androidx.lifecycle.ViewModelProvider
-import com.example.pomodorotechnique.models.TimerState.*
+import androidx.savedstate.SavedStateRegistryOwner
 import com.example.pomodorotechnique.databinding.FragmentTimerBinding
 import com.example.pomodorotechnique.models.Task
 import com.example.pomodorotechnique.models.TimerState
+import com.example.pomodorotechnique.utils.cancelNotifications
+import com.example.pomodorotechnique.utils.sendNotification
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.android.material.snackbar.Snackbar
-import java.util.*
-import kotlin.concurrent.timer
 
 
 class FragmentTimer : Fragment() {
 
     private lateinit var binding : FragmentTimerBinding
-    private val timerViewModel = TimerViewModel()
+    private val timerViewModel by viewModels<TimerViewModel>()
     private lateinit var tasksViewModel : TasksViewModel
     private lateinit var task : Task
     private lateinit var currentTask : Task
-    private lateinit var oldTask : Task
+
+    //variables for notifications
+    private lateinit var notificationManager: NotificationManager
+    private lateinit var pendingIntent: PendingIntent
+    private lateinit var action: NotificationCompat.Action
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -60,6 +72,46 @@ class FragmentTimer : Fragment() {
             binding.imageButton3.setVisibility(View.GONE)
         }
 
+        timerViewModel.secondsRemaining.observe(viewLifecycleOwner,{
+            updateCountdownUI()
+            if(::currentTask.isInitialized) {
+                timerViewModel.updateCurrentTaskState(currentTask)
+            }
+        })
+        timerViewModel.timerState.observe(viewLifecycleOwner,{
+            updateUIText()
+            //updateAnimation()
+        })
+
+        val fab: FloatingActionButton = binding.fab
+        fab.setOnClickListener { view ->
+            showAlertDialog()
+        }
+
+        //notifications
+        createChanel(
+            getString(R.string.notification_channel_id),
+            getString(R.string.notification_channel_name)
+        )
+
+        timerViewModel.timerState.observe(viewLifecycleOwner, {
+            if(timerViewModel.timerState.value == TimerState.Completed) {
+                Log.i("MainActivity", "Should send Notification")
+                onTimerCompleted("Timer Done, take a Rest!")
+            }
+            if(timerViewModel.timerState.value == TimerState.RestCompleted) {
+                Log.i("MainActivity", "Should send Notification")
+                onTimerCompleted("Timer Done, back to work!")
+            }
+        })
+
+        return binding.root
+    }
+
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
         binding.buttonPlay.setOnClickListener{ v ->
 
             if(timerViewModel.timerState.value == TimerState.OnRestPaused){
@@ -75,28 +127,17 @@ class FragmentTimer : Fragment() {
             timerViewModel.onPause()
             updateCountdownUI()
         }
-
-        timerViewModel.secondsRemaining.observe(viewLifecycleOwner,{
-            updateCountdownUI()
-            timerViewModel.updateCurrentTaskState(currentTask)
-        })
-        timerViewModel.timerState.observe(viewLifecycleOwner,{
-            updateUIText()
-        })
-
-        val fab: FloatingActionButton = binding.fab
-        fab.setOnClickListener { view ->
-            showAlertDialog()
-        }
-
-        return binding.root
     }
 
-    private fun updateCountdownUI(){
-        val secondsInString = timerViewModel.secondsInMinutesUntilFinished.toString()
-        val minutesUntilFinished = timerViewModel.minutesUntilFinished
 
-            if(timerViewModel.timerState.value == TimerState.Completed){
+    private fun updateCountdownUI(){
+        var secondsRemaining = timerViewModel.secondsRemaining.value!!
+        val minutesUntilFinished = secondsRemaining / 60
+        val secondsInMinutesUntilFinished = secondsRemaining - minutesUntilFinished * 60
+
+        val secondsInString = secondsInMinutesUntilFinished.toString()
+
+            if(timerViewModel.secondsRemaining == null){
                 binding.textViewCountdown.text = ""
             }
             else{
@@ -104,6 +145,7 @@ class FragmentTimer : Fragment() {
                 if (secondsInString.length == 2) secondsInString
                 else "0" + secondsInString}"
             }
+        Log.i("MainActivity", "Seconds remaining liveData {${timerViewModel.secondsRemaining.value}}")
         }
 
     private fun updateUIText() {
@@ -111,18 +153,40 @@ class FragmentTimer : Fragment() {
 
         var stateString: String =
             when (timerViewModel.timerState.value) {
-                TimerState.Completed -> "Press play to start a new cycle!"
                 TimerState.OnFocusRunning -> "Stay Focused!"
                 TimerState.OnRestRunning -> "Take a rest!"
                 TimerState.OnFocusPaused -> "Stay Focused! (Paused)"
-                else -> "Take a rest! (Paused)"
+                TimerState.OnRestPaused -> "Take a rest! (Paused)"
+                else -> "Get started by creating a new task!"
             }
 
-        if(timerViewModel.timerState.value == TimerState.Completed){
+        if(timerViewModel.timerState.value == TimerState.Completed ||
+            timerViewModel.timerState.value == TimerState.NotStarted){
             binding.textViewState.text = "$stateString"
         }
         else {
             binding.textViewState.text = "Cycle: $cycleString - $stateString"
+        }
+    }
+
+    private fun updateAnimation(){
+        Log.i("MainActivity", "Update animation called")
+        when (timerViewModel.timerState.value) {
+            TimerState.OnFocusRunning -> {
+                //binding.animations.startAnimation()
+            }
+            TimerState.OnRestRunning -> {
+               // binding.animations.startAnimation()
+            }
+            TimerState.OnFocusPaused -> {
+               // binding.animations.pauseAnimation()
+            }
+            TimerState.OnRestPaused -> {
+                //binding.animations.pauseAnimation()
+            }
+            else -> {
+                //binding.animations.cancelAnimation()
+            }
         }
     }
 
@@ -175,5 +239,36 @@ class FragmentTimer : Fragment() {
             }
             .show()
     }
+
+    private fun onTimerCompleted(message: String) {
+        //initialize an instance of Notification Manager
+        val notificationManager = ContextCompat.getSystemService(
+            requireContext(),
+            NotificationManager::class.java
+        ) as NotificationManager
+
+        //cancel previous notifications
+        notificationManager.cancelNotifications()
+        //send new notification
+        notificationManager.sendNotification(message, requireContext())
+    }
+
+    private fun createChanel(channelId: String, channelName: String) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val notificationChannel = NotificationChannel(
+                channelId, channelName, NotificationManager.IMPORTANCE_LOW
+            )
+
+            notificationChannel.enableLights(true)
+            notificationChannel.lightColor = Color.RED
+            notificationChannel.enableVibration(true)
+            notificationChannel.description = getString(R.string.app_name)
+
+            val notificationManager = requireActivity().getSystemService(NotificationManager::class.java)
+            notificationManager.createNotificationChannel(notificationChannel)
+        }
+
+    }
+
 
 }

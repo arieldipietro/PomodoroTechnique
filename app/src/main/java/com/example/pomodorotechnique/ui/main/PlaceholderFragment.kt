@@ -1,5 +1,6 @@
 package com.example.pomodorotechnique.ui.main
 
+import android.app.Activity
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -13,6 +14,7 @@ import androidx.viewpager2.widget.ViewPager2
 import com.example.pomodorotechnique.FragmentHistory
 import com.example.pomodorotechnique.R
 import com.example.pomodorotechnique.databinding.FragmentMainBinding
+import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 
 /**
@@ -22,6 +24,7 @@ class PlaceholderFragment : Fragment() {
 
     private lateinit var pageViewModel: PageViewModel
     private var _binding: FragmentMainBinding? = null
+    private lateinit var viewPager: ViewPager2
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -32,7 +35,7 @@ class PlaceholderFragment : Fragment() {
         pageViewModel = ViewModelProvider(this).get(PageViewModel::class.java).apply {
             setIndex(arguments?.getInt(ARG_SECTION_NUMBER) ?: 1)
         }
-
+        viewPager = requireView().findViewById(R.id.view_pager)
     }
 
     override fun onCreateView(
@@ -71,6 +74,20 @@ class PlaceholderFragment : Fragment() {
             }
         }
     }
+
+    //this is not working
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        val tabLayout: TabLayout = requireView().findViewById(R.id.tabs)
+        TabLayoutMediator(tabLayout, viewPager) {
+                tab, position ->  viewPager.setCurrentItem(tab.position, true)
+            if (position == 1)
+                tab.text = "History"
+            if (position == 0)
+                tab.text = "Timer"
+        }.attach()
+    }
+
+
 
     override fun onDestroyView() {
         super.onDestroyView()

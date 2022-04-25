@@ -1,14 +1,19 @@
 package com.example.pomodorotechnique
 
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.*
-import androidx.fragment.app.Fragment
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.pomodorotechnique.databinding.FragmentHistoryBinding
 import com.example.pomodorotechnique.databinding.IndividualTaskViewBinding
 import com.example.pomodorotechnique.models.Task
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import java.lang.reflect.Type
+
 
 class FragmentHistory : Fragment() {
 
@@ -16,7 +21,6 @@ class FragmentHistory : Fragment() {
     private lateinit var tasksListContainer : ViewGroup
     private lateinit var tasksViewModel : TasksViewModel
     private lateinit var currentTask : Task
-
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -38,9 +42,7 @@ class FragmentHistory : Fragment() {
         if(tasksViewModel.currentTasksList.isNotEmpty()) {
             currentTask = tasksViewModel.currentTasksList[0]
         }
-        /*else{
-            temporaryFirstTask
-        }*/
+
 
         //Checks if the list has some items, otherwise displays a message
         checkCurrentTasksList()
@@ -51,7 +53,13 @@ class FragmentHistory : Fragment() {
 
         setHasOptionsMenu(true)
 
+
         return binding.root
+    }
+
+    override fun onPause() {
+        super.onPause()
+
     }
 
     override fun onResume() {
@@ -124,6 +132,8 @@ class FragmentHistory : Fragment() {
         binding.currentTaskCyclesCompleted.text = getString(R.string.task_cycles_completed) +" "+currentTask.cyclesCompleted.toString()
     }
 
+
+    
 
 
 }
