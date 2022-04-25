@@ -18,9 +18,7 @@ import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.SavedStateViewModelFactory
 import androidx.lifecycle.ViewModelProvider
-import androidx.savedstate.SavedStateRegistryOwner
 import com.example.pomodorotechnique.databinding.FragmentTimerBinding
 import com.example.pomodorotechnique.models.Task
 import com.example.pomodorotechnique.models.TimerState
@@ -78,8 +76,9 @@ class FragmentTimer : Fragment() {
                 timerViewModel.updateCurrentTaskState(currentTask)
             }
         })
+
         timerViewModel.timerState.observe(viewLifecycleOwner,{
-            updateUIText()
+                updateUIText()
             //updateAnimation()
         })
 
@@ -149,7 +148,7 @@ class FragmentTimer : Fragment() {
         }
 
     private fun updateUIText() {
-        var cycleString: String = (timerViewModel.cyclesCount+1).toString()
+        val cycleString = (timerViewModel.cyclesCount2.value!! + 1).toString()
 
         var stateString: String =
             when (timerViewModel.timerState.value) {
@@ -161,7 +160,7 @@ class FragmentTimer : Fragment() {
             }
 
         if(timerViewModel.timerState.value == TimerState.Completed ||
-            timerViewModel.timerState.value == TimerState.NotStarted){
+            timerViewModel.timerState.value == TimerState.NotStarted) {
             binding.textViewState.text = "$stateString"
         }
         else {
@@ -209,7 +208,7 @@ class FragmentTimer : Fragment() {
                     newTask.restTime = 0L
 
                     currentTask = newTask
-                    //esto para pasar el task al otro fragment. dsps cuando ingrese uno nuevo tengo que limpiar la lista
+                    //TODO: esto para pasar el task al otro fragment. dsps cuando ingrese uno nuevo tengo que limpiar la lista
                     tasksViewModel.addCurrentTask(currentTask)
 
                     timerViewModel.onReset()
