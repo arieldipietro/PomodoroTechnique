@@ -172,19 +172,19 @@ class FragmentTimer : Fragment() {
         Log.i("MainActivity", "Update animation called")
         when (timerViewModel.timerState.value) {
             TimerState.OnFocusRunning -> {
-                //binding.animations.startAnimation()
+                binding.animations.animateProgress(timerViewModel.secondsRemaining.value!!)
             }
             TimerState.OnRestRunning -> {
-               // binding.animations.startAnimation()
+               binding.animations.animateProgress(timerViewModel.secondsRemaining.value!!)
             }
             TimerState.OnFocusPaused -> {
-               // binding.animations.pauseAnimation()
+               binding.animations.pauseAnimation()
             }
             TimerState.OnRestPaused -> {
-                //binding.animations.pauseAnimation()
+                binding.animations.pauseAnimation()
             }
             else -> {
-                //binding.animations.cancelAnimation()
+                binding.animations.cancelAnimation()
             }
         }
     }
