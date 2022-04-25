@@ -23,13 +23,12 @@
         tools:layout_editor_absoluteX="1dp"
         tools:layout_editor_absoluteY="0dp" />
 
-    <!--<com.example.pomodorotechnique.canvasdrawings.Animations
+    <com.example.pomodorotechnique.canvasdrawings.Animations
         android:id="@+id/animations"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:layout_editor_absoluteX="1dp"
-        tools:layout_editor_absoluteY="0dp" />-->
-
+        tools:layout_editor_absoluteY="0dp" />
 
     <ImageButton
         android:id="@+id/button_play"
