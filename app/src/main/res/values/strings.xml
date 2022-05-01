@@ -10,8 +10,9 @@
     <string name="list_empty_text">There are no Tasks to display. \nGet started by creating a new Task!</string>
     <string name="task_date_created">Date created: </string>
     <string name="task_cycles_completed">Cycles completed: </string>
-    <string name="notification_channel_id">download_channel</string>
+    <string name="notification_channel_id">timer_notification_channel</string>
     <string name="notification_title">Pomodoro Technique App</string>
     <string name="notification_button">Take me back to timer!</string>
     <string name="notification_channel_name">Timer Done</string>
+    <string name="get_started">Get started by creating a new task, \nor select one from history!</string>
 </resources>

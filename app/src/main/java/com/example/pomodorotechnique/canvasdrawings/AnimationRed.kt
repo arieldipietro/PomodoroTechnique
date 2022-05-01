@@ -9,7 +9,7 @@ import android.util.Log
 import android.view.View
 import com.example.pomodorotechnique.R
 
-class Animations @JvmOverloads constructor(
+class AnimationRed @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 ) : View(context, attrs, defStyleAttr) {
 
@@ -20,9 +20,9 @@ class Animations @JvmOverloads constructor(
     //instance of ValueAnimator
     private val valueAnimator = ValueAnimator()
 
-    //filling the animated circle
-    val paintAnimation = Paint().apply {
-        setColor(getResources().getColor(R.color.primaryDarkColor))
+    //filling the animated red circle
+    val paintAnimationRed = Paint().apply {
+        setColor(getResources().getColor(R.color.redForAnimation))
         isAntiAlias = true // ensure the drawing has smooth edges
         style = Paint.Style.STROKE
         strokeCap = Paint.Cap.ROUND
@@ -34,13 +34,13 @@ class Animations @JvmOverloads constructor(
         setSpace()
 
         //drawing the animation
-        drawLoadingAnimation(canvas!!)
+        drawLoadingAnimationRed(canvas!!)
     }
 
-    private fun drawLoadingAnimation(canvas: Canvas){
+    private fun drawLoadingAnimationRed(canvas: Canvas){
         val percentageToFill = getCurrentPercentageToFill()
         //animating the filled button
-        canvas.drawArc(ovalSpace, 270f, percentageToFill, false, paintAnimation)
+        canvas.drawArc(ovalSpace, 270f, percentageToFill, false, paintAnimationRed)
         invalidate()
     }
 
@@ -86,6 +86,9 @@ class Animations @JvmOverloads constructor(
     }
     fun cancelAnimation(){
         valueAnimator.cancel()
+    }
+    fun resumeAnimation(){
+        valueAnimator.resume()
     }
 
     companion object {

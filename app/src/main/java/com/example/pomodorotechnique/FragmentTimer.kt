@@ -3,7 +3,6 @@ package com.example.pomodorotechnique
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.app.PendingIntent
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
@@ -13,39 +12,43 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
-import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
+import com.example.pomodorotechnique.database.TasksDatabase
+import com.example.pomodorotechnique.database.TasksDatabaseDao
 import com.example.pomodorotechnique.databinding.FragmentTimerBinding
-import com.example.pomodorotechnique.models.Task
 import com.example.pomodorotechnique.models.TimerState
+import com.example.pomodorotechnique.tasks.ViewModelFactory
 import com.example.pomodorotechnique.utils.cancelNotifications
 import com.example.pomodorotechnique.utils.sendNotification
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class FragmentTimer : Fragment() {
 
     private lateinit var binding : FragmentTimerBinding
-    private val timerViewModel by viewModels<TimerViewModel>()
-    private lateinit var tasksViewModel : TasksViewModel
-    private lateinit var task : Task
-    private lateinit var currentTask : Task
+
+    //Instance of the  ViewModels
+    private lateinit var timerViewModel: TimerViewModel
+
+    //Instance of Database
+    private lateinit var datasource : TasksDatabaseDao
 
     //variables for notifications
-    private lateinit var notificationManager: NotificationManager
+    /*private lateinit var notificationManager: NotificationManager
     private lateinit var pendingIntent: PendingIntent
     private lateinit var action: NotificationCompat.Action
-
-
+*/
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = DataBindingUtil.inflate(
             inflater,
             R.layout.fragment_timer,
@@ -53,138 +56,259 @@ class FragmentTimer : Fragment() {
             false
         )
 
-        //reference to the viewModel
-        tasksViewModel = ViewModelProvider(requireActivity()).get(TasksViewModel::class.java)
 
-        task = Task("","",0,0L,0L)
-        binding.task = task
+        val application = requireNotNull(this.activity).application
+        datasource = TasksDatabase.getInstance(application!!).tasksDatabaseDao
 
-        if(::currentTask.isInitialized) {
-            binding.buttonPlay.setVisibility(View.VISIBLE)
-            binding.buttonPause.setVisibility(View.VISIBLE)
-            binding.imageButton3.setVisibility(View.VISIBLE)
-        }
-        else{
-            binding.buttonPlay.setVisibility(View.GONE)
-            binding.buttonPause.setVisibility(View.GONE)
-            binding.imageButton3.setVisibility(View.GONE)
-        }
+        val viewModelFactory = ViewModelFactory(datasource, application)
 
-        timerViewModel.secondsRemaining.observe(viewLifecycleOwner,{
-            updateCountdownUI()
-            if(::currentTask.isInitialized) {
-                timerViewModel.updateCurrentTaskState(currentTask)
+        timerViewModel = ViewModelProvider(this, viewModelFactory)[TimerViewModel::class.java]
+
+        timerViewModel.instantiateUI()
+
+        //Observing if there's a task created already. In that case, show media buttons
+        timerViewModel.currentTask.observe(viewLifecycleOwner) {
+            Log.i("MainActivity", "current task oberver called ONCREATEVIEW")
+            Log.i("MainActivity", "current task from observer ONCREATEVIEW :${timerViewModel.currentTask.value}")
+            if (timerViewModel.currentTask == null || timerViewModel.currentTask.value!!.name == "FakeTask") {
+                binding.buttonPlay.setVisibility(View.GONE)
+                binding.buttonPause.setVisibility(View.GONE)
+                binding.imageButton3.setVisibility(View.GONE)
+            } else {
+                binding.buttonPlay.setVisibility(View.VISIBLE)
+                binding.buttonPause.setVisibility(View.VISIBLE)
+                binding.imageButton3.setVisibility(View.VISIBLE)
             }
-        })
+            updateUIText()
+            updateCountdownUI()
+            updateAnimation()
+        }
 
-        timerViewModel.timerState.observe(viewLifecycleOwner,{
+        //Observing selected taskId, to update the UI
+        timerViewModel.selectedTaskId.observe(viewLifecycleOwner) {
+            Log.i("MainActivity", "selected task live data called")
+            updateUIText()
+            updateCountdownUI()
+        }
+
+        //Observing seconds remaining in timer, to update the UI clock
+            timerViewModel.secondsRemaining.observe(viewLifecycleOwner) {
+                if (timerViewModel.currentTask.value !== null) {
+                    updateCountdownUI()
+                }
+            }
+
+        //Observing TimerState, to update the text shown at the top
+            timerViewModel.timerState.observe(viewLifecycleOwner) {
                 updateUIText()
-            //updateAnimation()
-        })
+                updateAnimation()
+            }
+
 
         val fab: FloatingActionButton = binding.fab
         fab.setOnClickListener { view ->
             showAlertDialog()
         }
 
-        //notifications
+        /*Notifications*/
+
         createChanel(
             getString(R.string.notification_channel_id),
             getString(R.string.notification_channel_name)
         )
 
         timerViewModel.timerState.observe(viewLifecycleOwner, {
+
             if(timerViewModel.timerState.value == TimerState.Completed) {
-                Log.i("MainActivity", "Should send Notification")
+                //Log.i("MainActivity", "Should send Notification")
                 onTimerCompleted("Timer Done, take a Rest!")
             }
             if(timerViewModel.timerState.value == TimerState.RestCompleted) {
-                Log.i("MainActivity", "Should send Notification")
+                //Log.i("MainActivity", "Should send Notification")
                 onTimerCompleted("Timer Done, back to work!")
             }
         })
 
+        /*End of Notifications*/
+
+        updateUIText()
+        updateCountdownUI()
+        updateAnimation()
+
         return binding.root
     }
-
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         binding.buttonPlay.setOnClickListener{ v ->
+            when(timerViewModel.timerState.value){
+                TimerState.NotStarted -> {
+                    timerViewModel.startFocusTimer()
+                    //Log.i("MainActivity", "secondsRemaining for animation: ${timerViewModel.secondsRemaining.value}")
+                }
+                TimerState.OnFocusRunning -> {}
+                TimerState.OnFocusPaused  -> {
+                    timerViewModel.startFocusTimer()
+                }
+                TimerState.OnRestRunning -> {}
+                TimerState.OnRestPaused  -> {
+                    timerViewModel.startRestTimer()
+                }
+                else -> {
+                    timerViewModel.startFocusTimer()
+                }
+            }
 
-            if(timerViewModel.timerState.value == TimerState.OnRestPaused){
-                timerViewModel.startRestTimer(currentTask)
-            }
-            else {
-                timerViewModel.startFocusTimer(currentTask)
-                updateCountdownUI()
-            }
+
         }
 
         binding.buttonPause.setOnClickListener{ v ->
             timerViewModel.onPause()
             updateCountdownUI()
         }
+        binding.imageButton3.setOnClickListener{
+        }
+
     }
 
+    override fun onPause() {
+        super.onPause()
+        Log.i("MainActivity", "onPause called")
+        timerViewModel.updateCurrentTaskPropertiesInDatabase()
+    }
 
-    private fun updateCountdownUI(){
-        var secondsRemaining = timerViewModel.secondsRemaining.value!!
+    /*override fun onResume() {
+        Log.i("MainActivity", "onResume called")
+        super.onResume()
+        //Observing if there's a task created already. In that case, show media buttons
+        timerViewModel.currentTask.observe(viewLifecycleOwner) {
+            Log.i("MainActivity", "current task oberver ON RESUME called")
+            Log.i("MainActivity", "current task from observerON RESUME :${timerViewModel.currentTask.value}")
+            if (timerViewModel.currentTask == null || timerViewModel.currentTask.value!!.name == "FakeTask") {
+                binding.buttonPlay.setVisibility(View.GONE)
+                binding.buttonPause.setVisibility(View.GONE)
+                binding.imageButton3.setVisibility(View.GONE)
+            } else {
+                binding.buttonPlay.setVisibility(View.VISIBLE)
+                binding.buttonPause.setVisibility(View.VISIBLE)
+                binding.imageButton3.setVisibility(View.VISIBLE)
+            }
+            updateUIText()
+            updateCountdownUI()
+            updateAnimation()
+        }
+
+        //Observing seconds remaining in timer, to update the UI clock
+        timerViewModel.secondsRemaining.observe(viewLifecycleOwner) {
+            if (timerViewModel.currentTask.value !== null) {
+                updateCountdownUI()
+            }
+        }
+
+        //Observing TimerState, to update the text shown at the top
+        timerViewModel.timerState.observe(viewLifecycleOwner) {
+            updateUIText()
+            updateAnimation()
+        }
+
+    }*/
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.i("MainActivity", "onPause called")
+        timerViewModel.updateCurrentTaskPropertiesInDatabase()
+    }
+
+    private fun updateCountdownUI() {
+        val secondsRemaining = timerViewModel.secondsRemaining.value!!
         val minutesUntilFinished = secondsRemaining / 60
         val secondsInMinutesUntilFinished = secondsRemaining - minutesUntilFinished * 60
 
         val secondsInString = secondsInMinutesUntilFinished.toString()
 
-            if(timerViewModel.secondsRemaining == null){
-                binding.textViewCountdown.text = ""
-            }
-            else{
-                binding.textViewCountdown.text = "$minutesUntilFinished:${
-                if (secondsInString.length == 2) secondsInString
-                else "0" + secondsInString}"
-            }
-        Log.i("MainActivity", "Seconds remaining liveData {${timerViewModel.secondsRemaining.value}}")
+        if(timerViewModel.secondsRemaining.value == null || timerViewModel.timerState.value == TimerState.NotStarted){
+            binding.textViewCountdown.text = ""
         }
+        else binding.textViewCountdown.text = "$minutesUntilFinished:${
+            if (secondsInString.length == 2) secondsInString
+            else "0$secondsInString"
+        }"
+    }
 
     private fun updateUIText() {
-        val cycleString = (timerViewModel.cyclesCount2.value!! + 1).toString()
-
-        var stateString: String =
-            when (timerViewModel.timerState.value) {
-                TimerState.OnFocusRunning -> "Stay Focused!"
-                TimerState.OnRestRunning -> "Take a rest!"
-                TimerState.OnFocusPaused -> "Stay Focused! (Paused)"
-                TimerState.OnRestPaused -> "Take a rest! (Paused)"
-                else -> "Get started by creating a new task!"
-            }
-
-        if(timerViewModel.timerState.value == TimerState.Completed ||
-            timerViewModel.timerState.value == TimerState.NotStarted) {
-            binding.textViewState.text = "$stateString"
+        if (timerViewModel.currentTask == null ||
+            timerViewModel.currentTask.value!!.name == "FakeTask"){
+            binding.textViewState.text = getString(R.string.get_started)
+            binding.taskTitle.setVisibility(View.GONE)
         }
         else {
-            binding.textViewState.text = "Cycle: $cycleString - $stateString"
+            binding.taskTitle.setVisibility(View.VISIBLE)
+            binding.taskTitle.text = "${timerViewModel.currentTask.value!!.name}"
+            val stateString: String =
+                when (timerViewModel.timerState.value) {
+                    TimerState.OnFocusRunning -> "Stay Focused!"
+                    TimerState.OnRestRunning -> "Take a rest!"
+                    TimerState.OnFocusPaused -> "Stay Focused! (Paused)"
+                    TimerState.OnRestPaused -> "Take a rest! (Paused)"
+                    else -> "Press Play Button to start!"
+                }
+
+            if (timerViewModel.timerState.value == TimerState.Completed ||
+                timerViewModel.timerState.value == TimerState.NotStarted
+            ) {
+                binding.textViewState.text = stateString
+            } else {
+                var cyclesString = (timerViewModel.cyclesCount.value!! + 1).toString()
+                binding.textViewState.text = "Cycle: $cyclesString - $stateString"
+            }
         }
     }
 
+
+
     private fun updateAnimation(){
-        Log.i("MainActivity", "Update animation called")
-        when (timerViewModel.timerState.value) {
+        when(timerViewModel.timerState.value){
             TimerState.OnFocusRunning -> {
-                binding.animations.animateProgress(timerViewModel.secondsRemaining.value!!)
+                binding.animationGreen.setVisibility(View.GONE)
+                binding.animationRed.setVisibility(View.VISIBLE)
+
+                if(timerViewModel.previousTimerState.value == TimerState.NotStarted) {
+                    binding.animationRed.animateProgress(timerViewModel.secondsRemaining.value!! * 1000L)
+                }
+                if(timerViewModel.previousTimerState.value == TimerState.RestCompleted) {
+                    binding.animationRed.animateProgress(timerViewModel.secondsRemaining.value!! * 1000L)
+                }
+                if(timerViewModel.previousTimerState.value == TimerState.Completed) {
+                    binding.animationRed.animateProgress(timerViewModel.secondsRemaining.value!! * 1000L)
+                }
+                else{
+                    binding.animationRed.resumeAnimation()
+                }
+            }
+            TimerState.OnFocusPaused  -> {
+                binding.animationGreen.setVisibility(View.GONE)
+                binding.animationRed.setVisibility(View.VISIBLE)
+                binding.animationRed.pauseAnimation()
             }
             TimerState.OnRestRunning -> {
-               binding.animations.animateProgress(timerViewModel.secondsRemaining.value!!)
+                binding.animationGreen.setVisibility(View.VISIBLE)
+                binding.animationRed.setVisibility(View.GONE)
+                if(timerViewModel.previousTimerState.value == TimerState.OnFocusRunning) {
+                    binding.animationGreen.animateProgress(timerViewModel.secondsRemaining.value!! * 1000L)
+                }
+                else{
+                    binding.animationGreen.resumeAnimation()
+                }
             }
-            TimerState.OnFocusPaused -> {
-               binding.animations.pauseAnimation()
-            }
-            TimerState.OnRestPaused -> {
-                binding.animations.pauseAnimation()
+            TimerState.OnRestPaused  -> {
+                binding.animationGreen.setVisibility(View.VISIBLE)
+                binding.animationRed.setVisibility(View.GONE)
+                binding.animationGreen.pauseAnimation()
             }
             else -> {
-                binding.animations.cancelAnimation()
+                binding.animationGreen.setVisibility(View.GONE)
+                binding.animationRed.setVisibility(View.GONE)
             }
         }
     }
@@ -198,40 +322,8 @@ class FragmentTimer : Fragment() {
             .setView(inputTaskName)
             .setPositiveButton(R.string.ok){dialog, switch ->
 
-                if(::currentTask.isInitialized) {
-                    timerViewModel.updateCurrentTaskState(currentTask)
-                    tasksViewModel.addTaskToHistory(currentTask)
+                timerViewModel.createNewTask(inputTaskName.text.toString())
 
-                    var newTask = tasksViewModel.createNewTask(inputTaskName.text.toString())
-                    newTask.cyclesCompleted = 0
-                    newTask.focusedTime = 0L
-                    newTask.restTime = 0L
-
-                    currentTask = newTask
-                    //TODO: esto para pasar el task al otro fragment. dsps cuando ingrese uno nuevo tengo que limpiar la lista
-                    tasksViewModel.addCurrentTask(currentTask)
-
-                    timerViewModel.onReset()
-
-                    Log.i("MainActivity", "ListData ${tasksViewModel.tasksListData.value}")
-                }
-                else{
-                    var newTask = tasksViewModel.createNewTask(inputTaskName.text.toString())
-                    newTask.cyclesCompleted = 0
-                    newTask.focusedTime = 0L
-                    newTask.restTime = 0L
-
-                    currentTask = newTask
-                    //esto para pasar el task al otro fragment. dsps cuando ingrese uno nuevo tengo que limpiar la lista
-                    tasksViewModel.addCurrentTask(currentTask)
-
-                    timerViewModel.onReset()
-
-                    Log.i("MainActivity", "current task view model ${tasksViewModel.currentTasksList}")
-                }
-                binding.buttonPlay.setVisibility(View.VISIBLE)
-                binding.buttonPause.setVisibility(View.VISIBLE)
-                binding.imageButton3.setVisibility(View.VISIBLE)
             }
             .setNegativeButton(R.string.cancel){dialog, switch ->
                 //TODO: Implement cancel button

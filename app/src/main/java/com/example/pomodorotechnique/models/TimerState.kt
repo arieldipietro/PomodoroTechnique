@@ -1,13 +1,14 @@
 package com.example.pomodorotechnique.models
 
-sealed class TimerState {
+//making it an enum class so there's no need to add a typeConverter in the database
+enum class TimerState {
 
-    object OnFocusRunning : TimerState()
-    object OnRestRunning : TimerState()
-    object OnFocusPaused : TimerState()
-    object OnRestPaused : TimerState()
-    object Completed : TimerState()
-    object RestCompleted : TimerState()
-    object NotStarted : TimerState()
+    OnFocusRunning,
+    OnRestRunning,
+    OnFocusPaused,
+    OnRestPaused,
+    Completed,
+    RestCompleted,
+    NotStarted
 
 }

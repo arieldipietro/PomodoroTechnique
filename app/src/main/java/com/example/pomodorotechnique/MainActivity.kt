@@ -31,12 +31,6 @@ import com.google.android.material.tabs.TabLayoutMediator
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
-    /*private val timerViewModel by viewModels<TimerViewModel>()
-    //private val tasksViewModel = ViewModelProvider(this).get(TasksViewModel::class.java)
-
-    var timerState = timerViewModel.timerState.value.toString()
-    var cyclesCount = timerViewModel.secondsRemaining.value!!
-    var secondsRemaining = timerViewModel.cyclesCount*/
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,45 +38,22 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-       /* // Check whether we're recreating a previously destroyed instance
-        if (savedInstanceState != null) {
-            with(savedInstanceState) {
-                // Restore value of members from saved state
-                timerState = getString(TIMER_STATE)!!
-                cyclesCount = getLong(CYCLES_COUNT)
-                secondsRemaining = getInt(SECONDS_REMAINING)
-            }
-        } else {
-            // Probably initialize members with default values for a new instance
-        }*/
-
         val sectionsPagerAdapter = SectionsPagerAdapter(this)
         val viewPager: ViewPager2 = binding.viewPager
         viewPager.adapter = sectionsPagerAdapter
         val tabLayout: TabLayout = binding.tabs
         TabLayoutMediator(tabLayout, viewPager) { tab, position ->
-            tab.text = "OBJECT ${(position + 1)}"
+            if(position == 0){
+                tab.text = "Timer"
+            }
+            else{
+                tab.text = "History"
+            }
         }.attach()
 
     }
 
-    /*override fun onSaveInstanceState(outState: Bundle) {
-        // Save the user's current game state
-        outState?.run {
-            putString(TIMER_STATE, timerViewModel.timerState.value.toString())
-            putLong(SECONDS_REMAINING, timerViewModel.secondsRemaining.value!!)
-            putInt(CYCLES_COUNT, timerViewModel.cyclesCount)
-        }
-
-        // Always call the superclass so it can save the view hierarchy state
-        super.onSaveInstanceState(outState)
+    override fun onPause() {
+        super.onPause()
     }
-
-    companion object {
-        val TIMER_STATE = "timerState"
-        val SECONDS_REMAINING = "secondsRemaining"
-        val CYCLES_COUNT = "CyclesCount"
-    }*/
-
-
 }

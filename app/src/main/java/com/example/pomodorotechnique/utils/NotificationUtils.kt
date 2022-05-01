@@ -20,9 +20,11 @@ fun NotificationManager.sendNotification(messageBody: String, applicationContext
     //Intent to open MainActivity when the user clicks the notification
     val contentIntent = Intent(applicationContext, MainActivity::class.java)
 
-    val contentPendingIntent = PendingIntent.getActivity(
-        applicationContext, NOTIFICATION_ID, contentIntent, PendingIntent.FLAG_IMMUTABLE
-    )
+    //this to come back to the current Screen when notification is clicked
+    contentIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
+
+    val contentPendingIntent = PendingIntent.getActivity(applicationContext, NOTIFICATION_ID, contentIntent, PendingIntent.FLAG_IMMUTABLE)
+
     val alarmSound : Uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
 
     val builder = NotificationCompat.Builder(
@@ -47,3 +49,4 @@ fun NotificationManager.sendNotification(messageBody: String, applicationContext
 fun NotificationManager.cancelNotifications(){
     cancelAll()
 }
+

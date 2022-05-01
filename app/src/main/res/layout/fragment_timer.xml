@@ -6,8 +6,8 @@
 
     <data>
         <variable
-            name="task"
-            type="com.example.pomodorotechnique.models.Task" />
+            name="timerViewModel"
+            type="com.example.pomodorotechnique.TimerViewModel" />
     </data>
 
 <androidx.constraintlayout.widget.ConstraintLayout
@@ -23,20 +23,39 @@
         tools:layout_editor_absoluteX="1dp"
         tools:layout_editor_absoluteY="0dp" />
 
-    <com.example.pomodorotechnique.canvasdrawings.Animations
-        android:id="@+id/animations"
+    <com.example.pomodorotechnique.canvasdrawings.AnimationRed
+        android:id="@+id/animationRed"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:layout_editor_absoluteX="1dp"
         tools:layout_editor_absoluteY="0dp" />
 
-    <ImageButton
-        android:id="@+id/button_play"
+    <com.example.pomodorotechnique.canvasdrawings.AnimationGreen
+        android:id="@+id/animationGreen"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="0dp" />
+
+    <TextView
+        android:id="@+id/task_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/textView_state"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/canvasDrawings"
+        tools:text="Task Title" />
+
+    <ImageButton
+        android:id="@+id/button_play"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
         android:layout_marginStart="32dp"
-        android:background="@color/primaryDarkColor"
-        android:src="@android:drawable/ic_media_play"
+        android:background="@color/white"
+        android:src="@drawable/ic_baseline_play_arrow_24"
         app:layout_constraintEnd_toStartOf="@+id/button_pause"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintHorizontal_chainStyle="spread"
@@ -45,10 +64,10 @@
 
     <ImageButton
         android:id="@+id/button_pause"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@color/primaryDarkColor"
-        android:src="@android:drawable/ic_media_pause"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:background="@color/white"
+        android:src="@drawable/ic_baseline_pause_24"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/imageButton3"
         app:layout_constraintHorizontal_bias="0.5"
@@ -58,11 +77,11 @@
 
     <ImageButton
         android:id="@+id/imageButton3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
         android:layout_marginEnd="32dp"
-        android:background="@color/primaryDarkColor"
-        android:src="@android:drawable/ic_media_next"
+        android:background="@color/white"
+        android:src="@drawable/ic_baseline_skip_next_24"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/button_pause"
@@ -84,6 +103,7 @@
         android:id="@+id/textView_state"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textAlignment="center"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
         android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -102,6 +122,8 @@
         app:layout_constraintBottom_toBottomOf="@+id/canvasDrawings"
         app:layout_constraintEnd_toEndOf="parent"
         app:srcCompat="@android:drawable/ic_input_add" />
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 

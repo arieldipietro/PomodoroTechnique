@@ -1,6 +1,5 @@
 package com.example.pomodorotechnique.ui.main
 
-import android.app.Activity
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,9 +8,7 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.viewpager.widget.ViewPager
 import androidx.viewpager2.widget.ViewPager2
-import com.example.pomodorotechnique.FragmentHistory
 import com.example.pomodorotechnique.R
 import com.example.pomodorotechnique.databinding.FragmentMainBinding
 import com.google.android.material.tabs.TabLayout

@@ -1,17 +1,12 @@
 package com.example.pomodorotechnique.ui.main
 
-import android.content.Context
-import android.os.Bundle
-import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
-import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
 import androidx.viewpager2.adapter.FragmentStateAdapter
-import com.example.pomodorotechnique.FragmentHistory
+import com.example.pomodorotechnique.screens.history.FragmentHistory
 import com.example.pomodorotechnique.FragmentTimer
 import com.example.pomodorotechnique.R
-import com.google.android.material.tabs.TabLayoutMediator
 
 private val TAB_TITLES = arrayOf(
     R.string.tab_text_1,
