@@ -14,7 +14,7 @@
         android:id="@+id/fragmentHistory"
         android:name="com.example.pomodorotechnique.screens.history.FragmentHistory"
         android:label="fragment_history2"
-        tools:layout="@layout/fragment_history2" >
+        tools:layout="@layout/fragment_history" >
         <action
             android:id="@+id/action_fragmentHistory_to_fragmentTimer"
             app:destination="@id/fragmentTimer" />

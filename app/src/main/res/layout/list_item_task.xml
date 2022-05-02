@@ -7,7 +7,7 @@
     <data>
         <variable
             name="task"
-            type="com.example.pomodorotechnique.database.Task2" />
+            type="com.example.pomodorotechnique.database.Task" />
         <variable
             name="clickListener"
             type="com.example.pomodorotechnique.screens.history.ItemClickListener"/>
@@ -26,6 +26,7 @@
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_alignParentStart="true"
+                android:contentDescription="@string/pomodoro_image_content_description"
                 android:paddingTop="8dp"
                 app:srcCompat="@drawable/tomato" />
 
@@ -47,13 +48,12 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:layout_toEndOf="@id/task_item_icon"
+                android:maxLines="1"
                 android:paddingTop="16dp"
                 android:paddingEnd="16dp"
-                android:maxLines="1"
-                tools:text="Title"
-                app:nameAdapter="@{task}"
                 android:textAppearance="?attr/textAppearanceSubtitle1"
-                />
+                app:nameAdapter="@{task}"
+                tools:text="Title" />
 
             <TextView
                 android:id="@+id/task_date_created"
@@ -62,12 +62,11 @@
                 android:layout_below="@id/task_title"
                 android:layout_gravity="center_vertical"
                 android:layout_toEndOf="@id/task_item_icon"
-                android:paddingEnd="16dp"
                 android:maxLines="1"
-                tools:text="Date created"
-                app:dateCreatedFormated="@{task}"
+                android:paddingEnd="16dp"
                 android:textAppearance="?attr/textAppearanceBody2"
-                />
+                app:dateCreatedFormated="@{task}"
+                tools:text="Date created" />
 
             <TextView
                 android:id="@+id/task_cycles_completed"
@@ -76,12 +75,24 @@
                 android:layout_below="@id/task_date_created"
                 android:layout_gravity="center_vertical"
                 android:layout_toEndOf="@id/task_item_icon"
-                android:paddingEnd="16dp"
                 android:maxLines="1"
-                tools:text="task_tertiary_text"
-                app:cyclesCompletedFormated="@{task}"
+                android:paddingEnd="16dp"
                 android:textAppearance="?attr/textAppearanceBody2"
-                />
+                app:cyclesCompletedFormated="@{task}"
+                tools:text="task_tertiary_text" />
+
+            <TextView
+                android:id="@+id/focused_time"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/task_cycles_completed"
+                android:layout_gravity="center_vertical"
+                android:layout_toEndOf="@id/task_item_icon"
+                android:maxLines="1"
+                android:paddingEnd="16dp"
+                android:textAppearance="?attr/textAppearanceBody2"
+                app:focusedTimeFormated="@{task}"
+                tools:text="task_tertiary_text" />
 
         </RelativeLayout>
 

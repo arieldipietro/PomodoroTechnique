@@ -73,7 +73,6 @@ class PlaceholderFragment : Fragment() {
         }
     }
 
-    //this is not working
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val tabLayout: TabLayout = requireView().findViewById(R.id.tabs)
         TabLayoutMediator(tabLayout, viewPager) {
@@ -84,8 +83,6 @@ class PlaceholderFragment : Fragment() {
                 tab.text = "Timer"
         }.attach()
     }
-
-
 
     override fun onDestroyView() {
         super.onDestroyView()

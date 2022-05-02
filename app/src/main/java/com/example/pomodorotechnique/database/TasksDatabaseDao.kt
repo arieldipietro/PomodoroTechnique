@@ -2,7 +2,6 @@ package com.example.pomodorotechnique.database
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
-import com.example.pomodorotechnique.models.TimerState
 
 /**
  * Defines methods for using the SleepNight class with Room.
@@ -10,8 +9,8 @@ import com.example.pomodorotechnique.models.TimerState
 @Dao
 interface TasksDatabaseDao {
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(task: Task2)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insert(task: Task)
 
     /**
      * When updating a row with a value already set in a column,
@@ -20,7 +19,7 @@ interface TasksDatabaseDao {
      * @param task new value to write
      */
     @Update
-    suspend fun update(task: Task2)
+    suspend fun update(task: Task)
 
     @Query("SELECT COUNT(*) FROM tasks_history_table")
     fun getCount(): Int
@@ -29,7 +28,7 @@ interface TasksDatabaseDao {
      * Selects and returns the row that matches the supplied Id, which is our key.
      */
     @Query("SELECT * from tasks_history_table WHERE  taskId = :key ")
-    suspend fun get(key: Long): Task2?
+    suspend fun get(key: Long): Task?
 
     /**
      * Deletes all values from the table.
@@ -48,13 +47,13 @@ interface TasksDatabaseDao {
      * sorted by Id in descending order.
      */
     @Query("SELECT * FROM tasks_history_table ORDER BY date_created DESC")
-    fun getAllTasks(): LiveData<List<Task2>>
+    fun getAllTasks(): LiveData<List<Task>>
 
     /**
      * Selects and returns the latest task.
      */
     @Query("SELECT * FROM tasks_history_table ORDER BY taskId DESC LIMIT 1")
-    fun getCurrentTask(): Task2?
+    fun getCurrentTask(): Task?
 
 }
 

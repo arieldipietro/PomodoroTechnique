@@ -1,31 +1,27 @@
 package com.example.pomodorotechnique.screens.history
 
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.Navigation
-import androidx.navigation.fragment.findNavController
 import com.example.pomodorotechnique.R
 import com.example.pomodorotechnique.TimerViewModel
-import com.example.pomodorotechnique.database.Task2
+import com.example.pomodorotechnique.database.Task
 import com.example.pomodorotechnique.database.TasksDatabase
 import com.example.pomodorotechnique.database.TasksDatabaseDao
-import com.example.pomodorotechnique.databinding.FragmentHistory2Binding
+import com.example.pomodorotechnique.databinding.FragmentHistoryBinding
 import com.example.pomodorotechnique.tasks.ViewModelFactory
-import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayout
 
 class FragmentHistory : Fragment(), ItemClickListener {
 
 
-    private lateinit var binding: FragmentHistory2Binding
+    private lateinit var binding: FragmentHistoryBinding
     private lateinit var tasksListContainer: ViewGroup
 
-    private lateinit var currentTask: Task2
+    private lateinit var currentTask: Task
     private lateinit var datasource: TasksDatabaseDao
 
     private lateinit var timerViewModel: TimerViewModel
@@ -37,7 +33,7 @@ class FragmentHistory : Fragment(), ItemClickListener {
 
         binding = DataBindingUtil.inflate(
             inflater,
-            R.layout.fragment_history2,
+            R.layout.fragment_history,
             container,
             false
         )
@@ -47,7 +43,7 @@ class FragmentHistory : Fragment(), ItemClickListener {
 
         val viewModelFactory = ViewModelFactory(datasource, application)
 
-        timerViewModel = ViewModelProvider(this, viewModelFactory)[TimerViewModel::class.java]
+        timerViewModel = ViewModelProvider(requireActivity(), viewModelFactory)[TimerViewModel::class.java]
 
         binding.timerViewModel = timerViewModel
         binding.lifecycleOwner = this
@@ -67,11 +63,14 @@ class FragmentHistory : Fragment(), ItemClickListener {
     }
 
     override fun navigateClick(taskId: Long) {
+
+        timerViewModel.cancelTimers()
+
         val tabLayout: TabLayout = this.requireActivity().findViewById(R.id.tabs)
         tabLayout.getTabAt(0)?.select()
 
         timerViewModel.setSelectedTaskId(taskId)
-        timerViewModel.initializeSelectedTask()
+        timerViewModel.getSelectedTaskFromDatabase(taskId)
     }
 
     override fun deleteClick(taskId: Long) {

@@ -10,4 +10,5 @@ class Todo {
     //sacar visibility de play cuando esta en pausa porque descajeta el timer si aprieto dos veces play
     //agregar notificaciones
     //overflow menu
+    //ver que hago cuando se elimina el ultimo metodo
 }

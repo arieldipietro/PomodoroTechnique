@@ -4,21 +4,23 @@ import android.app.Application
 import android.os.CountDownTimer
 import android.util.Log
 import androidx.lifecycle.*
-import com.example.pomodorotechnique.database.Task2
+import com.example.pomodorotechnique.database.Task
 import com.example.pomodorotechnique.database.TasksDatabaseDao
 import com.example.pomodorotechnique.models.TimerState
 import com.example.pomodorotechnique.models.TimerState.*
 import kotlinx.coroutines.*
 import java.util.*
 
+
+@Suppress("DEPRECATED_IDENTITY_EQUALS")
 class TimerViewModel(
     val database: TasksDatabaseDao,
     application: Application
 ) : AndroidViewModel(application) {
 
     object Timers {
-        const val INITIAL_FOCUS_TIME = 3*1L
-        const val SHORT_REST_TIME = 3*1L
+        const val INITIAL_FOCUS_TIME = 10*1L
+        const val SHORT_REST_TIME = 10*1L
         const val LONG_REST_TIME = 10*1L
     }
 
@@ -28,8 +30,12 @@ class TimerViewModel(
     private var timerLengthSeconds = 0L
     private var lastSavedTimer = 0L
 
-    private val _currentTask = MutableLiveData<Task2>()
-    val currentTask : LiveData<Task2>
+/*    private var animationGreen = AnimationGreen
+    private var animationRed = AnimationRed*/
+
+
+    private val _currentTask = MutableLiveData<Task>()
+    val currentTask : LiveData<Task>
         get() = _currentTask
 
     val allTasks = database.getAllTasks()
@@ -50,40 +56,40 @@ class TimerViewModel(
 
     fun getCurrentTaskFromDatabase() {
         Log.i("Mainctivity", "getCurrentTaskFromDatabase")
-        val job = GlobalScope.launch { // creates worker thread
+        GlobalScope.launch { // creates worker thread
             //Since we need to update UI from the coroutine, we should execute it on the main context
             withContext(Dispatchers.Default) {
                 Log.i("MainActivity", "getCurrenttask called: ")
 
                 val currentTaskFromDatabase = database.getCurrentTask()!!
                 _currentTask.postValue(currentTaskFromDatabase)
-                //updateLiveData()
+                _selectedTaskId.postValue(currentTaskFromDatabase.taskId)
+                updateLiveData()
             }
         }
-        runBlocking {
-            job.join() // wait until child coroutine completes
-            updateLiveData()
-        }
     }
 
-    /*private fun initializeCurrentTask(){
-        viewModelScope.launch {
-            _currentTask.value = getCurrentTaskFromDatabase()!!
-        }
-    }
-    suspend fun getCurrentTaskFromDatabase(): Task2? {
-        var currentTask = database.getCurrentTask()
-        return currentTask
-        }*/
+    fun getSelectedTaskFromDatabase(taskId: Long) {
+        //If the user is clicking on the current runnning task, don't do anything
+        if (taskId !== currentTask.value!!.taskId) {
 
-    fun initializeSelectedTask(){
-        viewModelScope.launch {
-            _currentTask.value = getSelectedTaskFromDatabase(selectedTaskId.value!!)!!
+            Log.i("Mainctivity", "getCurrentTaskFromDatabase")
+            GlobalScope.launch { // creates worker thread
+                //Since we need to update UI from the coroutine, we should execute it on the main context
+                withContext(Dispatchers.Default) {
+                    Log.i("MainActivity", "getCurrenttask called: ")
+
+                    val selectedTaskFromDatabase = database.get(taskId)!!
+                    _currentTask.postValue(selectedTaskFromDatabase)
+                    _selectedTaskId.postValue(taskId)
+                    updateLiveData()
+                    onResume(selectedTaskFromDatabase.taskId)
+                    Log.i("MainActivity", "timerState: ${timerState.value}")
+                    Log.i("MainActivity", "cycles Count: ${cyclesCount.value}")
+                }
+            }
+            //onResume(selectedTaskId.value!!)
         }
-    }
-    suspend fun getSelectedTaskFromDatabase(taskId: Long): Task2? {
-        var currentTask = database.get(selectedTaskId.value!!)!!
-        return currentTask
     }
 
     private val _selectedTaskId = MutableLiveData<Long>()
@@ -94,67 +100,36 @@ class TimerViewModel(
         Log.i("MainActivity", "selectedTaskId called, changed ID: ${selectedTaskId.value}")
     }
 
-
-
-
-    /*fun getSelectedTaskFromDatabase(taskId: Long) {
-        val currentTaskFromDatabase = Task2(0L, "FakeTask", "", 0L, 0, NotStarted, 0L)
-        Log.i("Mainctivity", "getCurrentTaskFromDatabase")
-        val job = GlobalScope.launch { // creates worker thread
-            withContext(Dispatchers.Default) {
-                Log.i("MainActivity", "getCurrenttask called: ")
-
-                val currentTaskFromDatabase = database.get(taskId)!!
-                _currentTask.postValue(currentTaskFromDatabase)
-                //updateLiveData()
-                Log.i("MainActivity", "current task: ${currentTask.value} ")
-
-
-            }
-        }
-        runBlocking {
-            job.join() // wait until child coroutine completes
-            //updateLiveData()
-            _cyclesCount.value = currentTaskFromDatabase.cyclesCount
-            _secondsRemaining.value = currentTaskFromDatabase.secondsRemaining
-            _timerState.value = currentTaskFromDatabase.timerState
-        }
-    }*/
-
-
-
     init {
         //init called
-        updateLiveData()
+        //dummy data to start UI
+        _selectedTaskId.value = 0L
     }
 
     fun instantiateUI(){
         //creating a dummy task to instantiate the UI
-        _currentTask.value = Task2(0L, "FakeTask", "", 0L, 0, NotStarted, 0L)
+        _currentTask.value = Task(0L, "FakeTask", "", 0L, 0, NotStarted, 0L)
         _cyclesCount.value = 0
         _secondsRemaining.value = 0L
         _timerState.value = NotStarted
     }
 
     fun updateLiveData() {
-        val job = GlobalScope.async { // creates worker thread
-            _cyclesCount.value = currentTask.value!!.cyclesCount
-            _secondsRemaining.value = currentTask.value!!.secondsRemaining
-            _timerState.value = currentTask.value!!.timerState
+            viewModelScope.launch { // creates worker thread
+                _cyclesCount.value = currentTask.value!!.cyclesCount
+                _secondsRemaining.value = 0L
+                _timerState.value = currentTask.value!!.timerState
+                Log.i("MainActivity", "cycles count : ${cyclesCount.value}")
+                Log.i("MainActivity", "timer state : ${timerState.value}")
         }
-/*
-        Log.i("MainActivity", "updated live data in database: ${currentTask.value}")
-        Log.i("MainActivity", "cycles count: ${cyclesCount.value}")
-        Log.i("MainActivity", "seconds remaining: ${secondsRemaining.value}")
-        Log.i("MainActivity", "timerState: ${timerState.value}")*/
     }
 
 
-    //call this function before UI changes and when destroying viws
+    //calling this function on every tick of the clock, so no need to call it again when the UI changes
     fun updateCurrentTaskPropertiesInDatabase() {
+        if(selectedTaskId.value !== 0L) {
         CoroutineScope(Dispatchers.IO).launch {
-            if(database.getCurrentTask() !== null) {
-                val currentTaskDatabase = database.getCurrentTask()
+                val currentTaskDatabase = database.get(selectedTaskId.value!!)
                 currentTaskDatabase?.timerState = timerState.value!!
                 currentTaskDatabase?.cyclesCount = cyclesCount.value!!
                 currentTaskDatabase?.secondsRemaining = secondsRemaining.value!!
@@ -164,30 +139,34 @@ class TimerViewModel(
     }
 
     fun startFocusTimer() {
-   /*     Log.i("MainActivity", "Start focus timer called")
-        Log.i("MainActivity", "Starting focus timer from: ${timerState.value}")*/
-        if (timerState.value == NotStarted) {
-            timerLengthSeconds = Timers.INITIAL_FOCUS_TIME
-            _cyclesCount.value = 0
-            _previousTimerState.value = NotStarted
-        }
-        if (timerState.value == RestCompleted) {
-            timerLengthSeconds = Timers.INITIAL_FOCUS_TIME
-            _previousTimerState.value = RestCompleted
-        } else {
-            lastSavedTimer
-            _previousTimerState.value = OnFocusPaused
+        Log.i("MainActivity", "timerState in startFocus: ${timerState.value}")
+        Log.i("MainActivity", "cycles Count in startFocus: ${cyclesCount.value}")
+        when(timerState.value) {
+            NotStarted -> {
+                timerLengthSeconds = Timers.INITIAL_FOCUS_TIME
+                _previousTimerState.value = NotStarted
+            }
+            RestCompleted -> {
+                timerLengthSeconds = Timers.INITIAL_FOCUS_TIME
+                _previousTimerState.value = RestCompleted
+            }
+            else -> {
+                if (::timerFocus.isInitialized) {
+                    timerLengthSeconds = secondsRemaining.value!!
+                }
+                _previousTimerState.value = OnFocusPaused
+            }
         }
             //setting seconds Remaining to start the animation
             _secondsRemaining.value = timerLengthSeconds
             _timerState.value = OnFocusRunning
 
-        //Log.i("Main Activity", "current state: ${timerState.value}, previous state: ${previousTimerState.value}")
-
+        Log.i("Main Activity", "current state: ${timerState.value}, previous state: ${previousTimerState.value}")
 
             timerFocus = object : CountDownTimer(timerLengthSeconds * 1000, 1000) {
                 override fun onFinish() {
                     _timerState.value = TimerState.Completed
+                    _cyclesCount.value = cyclesCount.value!! + 1
                     updateCurrentTaskPropertiesInDatabase()
                     timerFocus.cancel()
                     startRestTimer()
@@ -203,11 +182,6 @@ class TimerViewModel(
         }
 
         fun startRestTimer() {
-
-/* Log.i("MainActivity", "timerState: ${timerState.value}")
-        Log.i("MainActivity", "cycle: ${cyclesCount2.value}")*/
-
-
                 if (timerState.value == OnRestPaused) {
                     timerLengthSeconds = lastSavedTimer
                     _previousTimerState.value = OnRestPaused
@@ -229,13 +203,12 @@ class TimerViewModel(
             _secondsRemaining.value = timerLengthSeconds
 
             _timerState.value = OnRestRunning
-            //updateCurrentTaskTimerState()
 
             timerRest = object : CountDownTimer(timerLengthSeconds * 1000, 1000) {
 
                 override fun onFinish() {
                     _timerState.value = RestCompleted
-                    _cyclesCount.value = cyclesCount.value!! + 1
+                    //_cyclesCount.value = cyclesCount.value!! + 1
                     updateCurrentTaskPropertiesInDatabase()
                     timerRest.cancel()
                     startFocusTimer()
@@ -252,28 +225,67 @@ class TimerViewModel(
             }.start()
         }
 
+    fun cancelTimers() {
+        //If the user is clicking on the current runnning task, don't do anything
+        if (selectedTaskId.value !== currentTask.value!!.taskId) {
+            if (::timerFocus.isInitialized) {
+                timerFocus.cancel()
+            }
+            if (::timerRest.isInitialized) {
+                timerRest.cancel()
+            }
+        }
+    }
+
         fun onPause() {
+            /*The original idea was to save properties into database in this function. This was adding an unnecesary overload
+            since we've already saved the state in the last count of the clock. And then we are saving some
+            code in onResume method, since a task will never be saved in Pause states*/
             if (timerState.value == OnFocusRunning) {
                 _timerState.value = OnFocusPaused
                 timerFocus.cancel()
-                updateCurrentTaskPropertiesInDatabase()
+                //updateCurrentTaskPropertiesInDatabase()
             }
             if (timerState.value == OnRestRunning) {
                 _timerState.value = OnRestPaused
                 timerRest.cancel()
-                updateCurrentTaskPropertiesInDatabase()
+                //updateCurrentTaskPropertiesInDatabase()
             }
-            else{}
         }
 
-        fun onReset() {
-            _timerState.value = NotStarted
-            //updateCurrentTaskTimerState()
-            _cyclesCount.value = 0
-            //updateCurrentTaskCyclesCount()
-            _secondsRemaining.value = 0
-            if (::timerFocus.isInitialized) {
-                timerFocus.cancel()
+        fun onResume(taskId: Long) {
+
+            //CUANDO NO LO PAUSO, NO CAMBIA EL LIVE DATA
+            viewModelScope.launch {
+                val task = database.get(taskId)!!
+                Log.i("MainActivity", "onResume function called")
+                _secondsRemaining.postValue(0)
+                _cyclesCount.postValue(task.cyclesCount)
+
+                when (task.timerState) {
+                    TimerState.OnFocusRunning -> {
+                        _timerState.postValue(NotStarted)
+                        _previousTimerState.postValue(NotStarted)
+                       /*when the user STOPS the focus running, it means they haven't finished the focus time
+                        so when coming back, it restarts the same cycle*/
+                        if (cyclesCount.value !== 0) {
+                        _cyclesCount.postValue(task.cyclesCount)
+                    }
+                        else{
+                            _cyclesCount.postValue(1)
+                        }
+                }
+                    TimerState.OnRestRunning -> {
+                        _cyclesCount.postValue(cyclesCount.value!!)
+                        _timerState.postValue(RestCompleted)
+                    }
+                    //OnFocusPause and OnRestPause are not possible here, since data is not saved in onPause method
+                    else -> {
+                        _timerState.postValue(NotStarted)
+                    }
+                }
+                Log.i("MainActivity", "timerState: ${timerState.value}")
+                Log.i("MainActivity", "cycles Count: ${cyclesCount.value}")
             }
         }
 
@@ -286,7 +298,9 @@ class TimerViewModel(
         }
 
     fun createNewTask(name: String) {
-        val newTask = Task2()
+        cancelTimers()
+        _timerState.value = NotStarted
+        val newTask = Task()
         viewModelScope.launch {
             newTask.name = name
 
@@ -306,7 +320,7 @@ class TimerViewModel(
         }
     }
 
-    suspend fun insert(task: Task2){
+    suspend fun insert(task: Task){
         database.insert(task)
     }
     fun deleteTask(taskId: Long){

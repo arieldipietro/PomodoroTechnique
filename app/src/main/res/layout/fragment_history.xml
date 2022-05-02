@@ -11,19 +11,6 @@
             type="com.example.pomodorotechnique.TimerViewModel" />
     </data>
 
-    <!--<TextView
-        android:id="@+id/empty_list_text"
-        style="@style/TextAppearance.MaterialComponents.Body1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/list_empty_text"
-        android:textAlignment="center"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />-->
-
     <!-- using constraint layout so I can have the views floating in the screen-->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraint_layout"

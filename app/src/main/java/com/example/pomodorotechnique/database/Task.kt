@@ -10,7 +10,7 @@ import com.example.pomodorotechnique.models.TimerState
 
 @Entity(tableName = "tasks_history_table")
 @TypeConverters(Converters::class)
-data class Task2(
+data class Task(
 
     @PrimaryKey(autoGenerate = true)
     var taskId: Long = 0L,

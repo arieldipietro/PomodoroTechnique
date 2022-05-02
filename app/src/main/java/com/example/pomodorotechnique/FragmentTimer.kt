@@ -40,11 +40,7 @@ class FragmentTimer : Fragment() {
     //Instance of Database
     private lateinit var datasource : TasksDatabaseDao
 
-    //variables for notifications
-    /*private lateinit var notificationManager: NotificationManager
-    private lateinit var pendingIntent: PendingIntent
-    private lateinit var action: NotificationCompat.Action
-*/
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -62,7 +58,7 @@ class FragmentTimer : Fragment() {
 
         val viewModelFactory = ViewModelFactory(datasource, application)
 
-        timerViewModel = ViewModelProvider(this, viewModelFactory)[TimerViewModel::class.java]
+        timerViewModel = ViewModelProvider(requireActivity(), viewModelFactory)[TimerViewModel::class.java]
 
         timerViewModel.instantiateUI()
 
@@ -175,49 +171,6 @@ class FragmentTimer : Fragment() {
     override fun onPause() {
         super.onPause()
         Log.i("MainActivity", "onPause called")
-        timerViewModel.updateCurrentTaskPropertiesInDatabase()
-    }
-
-    /*override fun onResume() {
-        Log.i("MainActivity", "onResume called")
-        super.onResume()
-        //Observing if there's a task created already. In that case, show media buttons
-        timerViewModel.currentTask.observe(viewLifecycleOwner) {
-            Log.i("MainActivity", "current task oberver ON RESUME called")
-            Log.i("MainActivity", "current task from observerON RESUME :${timerViewModel.currentTask.value}")
-            if (timerViewModel.currentTask == null || timerViewModel.currentTask.value!!.name == "FakeTask") {
-                binding.buttonPlay.setVisibility(View.GONE)
-                binding.buttonPause.setVisibility(View.GONE)
-                binding.imageButton3.setVisibility(View.GONE)
-            } else {
-                binding.buttonPlay.setVisibility(View.VISIBLE)
-                binding.buttonPause.setVisibility(View.VISIBLE)
-                binding.imageButton3.setVisibility(View.VISIBLE)
-            }
-            updateUIText()
-            updateCountdownUI()
-            updateAnimation()
-        }
-
-        //Observing seconds remaining in timer, to update the UI clock
-        timerViewModel.secondsRemaining.observe(viewLifecycleOwner) {
-            if (timerViewModel.currentTask.value !== null) {
-                updateCountdownUI()
-            }
-        }
-
-        //Observing TimerState, to update the text shown at the top
-        timerViewModel.timerState.observe(viewLifecycleOwner) {
-            updateUIText()
-            updateAnimation()
-        }
-
-    }*/
-
-    override fun onDestroy() {
-        super.onDestroy()
-        Log.i("MainActivity", "onPause called")
-        timerViewModel.updateCurrentTaskPropertiesInDatabase()
     }
 
     private fun updateCountdownUI() {
@@ -238,11 +191,11 @@ class FragmentTimer : Fragment() {
 
     private fun updateUIText() {
         if (timerViewModel.currentTask == null ||
-            timerViewModel.currentTask.value!!.name == "FakeTask"){
+            timerViewModel.currentTask.value!!.name == "FakeTask"
+        ) {
             binding.textViewState.text = getString(R.string.get_started)
             binding.taskTitle.setVisibility(View.GONE)
-        }
-        else {
+        } else {
             binding.taskTitle.setVisibility(View.VISIBLE)
             binding.taskTitle.text = "${timerViewModel.currentTask.value!!.name}"
             val stateString: String =
@@ -259,8 +212,21 @@ class FragmentTimer : Fragment() {
             ) {
                 binding.textViewState.text = stateString
             } else {
-                var cyclesString = (timerViewModel.cyclesCount.value!! + 1).toString()
-                binding.textViewState.text = "Cycle: $cyclesString - $stateString"
+                val cyclesString: String
+                    when (timerViewModel.timerState.value) {
+                        TimerState.OnRestRunning -> {
+                            cyclesString = timerViewModel.cyclesCount.value!!.toString()
+                            binding.textViewState.text = "Cycle: $cyclesString - $stateString"
+                        }
+                        TimerState.OnRestPaused -> {
+                            cyclesString = timerViewModel.cyclesCount.value!!.toString()
+                            binding.textViewState.text = "Cycle: $cyclesString - $stateString"
+                        }
+                        else -> {
+                            cyclesString = (timerViewModel.cyclesCount.value!! + 1).toString()
+                            binding.textViewState.text = "Cycle: $cyclesString - $stateString"
+                        }
+                    }
             }
         }
     }
