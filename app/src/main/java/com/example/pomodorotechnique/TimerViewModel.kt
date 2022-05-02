@@ -48,7 +48,7 @@ class TimerViewModel(
     private val _cyclesCount = MutableLiveData<Int>()
     val cyclesCount : LiveData<Int> get() = _cyclesCount
 
-    /*fun getCurrentTaskFromDatabase() {
+    fun getCurrentTaskFromDatabase() {
         Log.i("Mainctivity", "getCurrentTaskFromDatabase")
         val job = GlobalScope.launch { // creates worker thread
             //Since we need to update UI from the coroutine, we should execute it on the main context
@@ -64,9 +64,9 @@ class TimerViewModel(
             job.join() // wait until child coroutine completes
             updateLiveData()
         }
-    }*/
+    }
 
-    private fun initializeCurrentTask(){
+    /*private fun initializeCurrentTask(){
         viewModelScope.launch {
             _currentTask.value = getCurrentTaskFromDatabase()!!
         }
@@ -74,7 +74,7 @@ class TimerViewModel(
     suspend fun getCurrentTaskFromDatabase(): Task2? {
         var currentTask = database.getCurrentTask()
         return currentTask
-        }
+        }*/
 
     fun initializeSelectedTask(){
         viewModelScope.launch {
@@ -85,6 +85,7 @@ class TimerViewModel(
         var currentTask = database.get(selectedTaskId.value!!)!!
         return currentTask
     }
+
     private val _selectedTaskId = MutableLiveData<Long>()
     val selectedTaskId : LiveData<Long> get() = _selectedTaskId
 
@@ -299,7 +300,7 @@ class TimerViewModel(
             insert(newTask)
             Log.i("MainActivity", "after Insert New Task")
             //Log.i("Main Activity", "task created: ${newTask}")
-            initializeCurrentTask()
+            getCurrentTaskFromDatabase()
             Log.i("MainActivity", "after Initialize current Task")
 
         }
