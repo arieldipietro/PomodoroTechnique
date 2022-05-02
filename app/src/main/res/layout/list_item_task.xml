@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="task"
+            type="com.example.pomodorotechnique.database.Task2" />
+        <variable
+            name="clickListener"
+            type="com.example.pomodorotechnique.screens.history.ItemClickListener"/>
+    </data>
+
+        <RelativeLayout
+            android:id="@+id/task_list_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:minHeight="88dp"
+            android:onClick="@{() -> clickListener.navigateClick(task.taskId)}">
+
+            <ImageView
+                android:id="@+id/task_item_icon"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_alignParentStart="true"
+                android:paddingTop="8dp"
+                app:srcCompat="@drawable/tomato" />
+
+            <ImageView
+                android:id="@+id/deleteIcon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerInParent="true"
+                android:layout_marginEnd="16dp"
+                android:tint="@color/primaryColor"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:srcCompat="@android:drawable/ic_menu_delete"
+                android:onClick="@{() -> clickListener.deleteClick(task.taskId)}"/>
+
+            <TextView
+                android:id="@+id/task_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_toEndOf="@id/task_item_icon"
+                android:paddingTop="16dp"
+                android:paddingEnd="16dp"
+                android:maxLines="1"
+                tools:text="Title"
+                app:nameAdapter="@{task}"
+                android:textAppearance="?attr/textAppearanceSubtitle1"
+                />
+
+            <TextView
+                android:id="@+id/task_date_created"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/task_title"
+                android:layout_gravity="center_vertical"
+                android:layout_toEndOf="@id/task_item_icon"
+                android:paddingEnd="16dp"
+                android:maxLines="1"
+                tools:text="Date created"
+                app:dateCreatedFormated="@{task}"
+                android:textAppearance="?attr/textAppearanceBody2"
+                />
+
+            <TextView
+                android:id="@+id/task_cycles_completed"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/task_date_created"
+                android:layout_gravity="center_vertical"
+                android:layout_toEndOf="@id/task_item_icon"
+                android:paddingEnd="16dp"
+                android:maxLines="1"
+                tools:text="task_tertiary_text"
+                app:cyclesCompletedFormated="@{task}"
+                android:textAppearance="?attr/textAppearanceBody2"
+                />
+
+        </RelativeLayout>
+
+</layout>
