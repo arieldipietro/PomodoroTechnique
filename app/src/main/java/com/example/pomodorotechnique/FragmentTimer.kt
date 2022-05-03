@@ -3,9 +3,13 @@ package com.example.pomodorotechnique
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.content.ContentResolver
 import android.graphics.Color
+import android.media.AudioAttributes
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import android.text.InputType
 import android.util.Log
 import android.view.LayoutInflater
@@ -29,6 +33,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlin.concurrent.timer
 
 class FragmentTimer : Fragment() {
 
@@ -69,11 +74,11 @@ class FragmentTimer : Fragment() {
             if (timerViewModel.currentTask == null || timerViewModel.currentTask.value!!.name == "FakeTask") {
                 binding.buttonPlay.setVisibility(View.GONE)
                 binding.buttonPause.setVisibility(View.GONE)
-                binding.imageButton3.setVisibility(View.GONE)
+                binding.buttonNext.setVisibility(View.GONE)
             } else {
                 binding.buttonPlay.setVisibility(View.VISIBLE)
                 binding.buttonPause.setVisibility(View.VISIBLE)
-                binding.imageButton3.setVisibility(View.VISIBLE)
+                binding.buttonNext.setVisibility(View.VISIBLE)
             }
             updateUIText()
             updateCountdownUI()
@@ -100,6 +105,13 @@ class FragmentTimer : Fragment() {
                 updateAnimation()
             }
 
+        //Observing all tasks, to update the UI clock when the user deletes the last available task
+        timerViewModel.allTasks.observe(viewLifecycleOwner) {
+            if (timerViewModel.allTasks.value!!.isEmpty()) {
+                timerViewModel.instantiateUI()
+            }
+        }
+
 
         val fab: FloatingActionButton = binding.fab
         fab.setOnClickListener { view ->
@@ -114,7 +126,6 @@ class FragmentTimer : Fragment() {
         )
 
         timerViewModel.timerState.observe(viewLifecycleOwner, {
-
             if(timerViewModel.timerState.value == TimerState.Completed) {
                 //Log.i("MainActivity", "Should send Notification")
                 onTimerCompleted("Timer Done, take a Rest!")
@@ -163,7 +174,8 @@ class FragmentTimer : Fragment() {
             timerViewModel.onPause()
             updateCountdownUI()
         }
-        binding.imageButton3.setOnClickListener{
+        binding.buttonNext.setOnClickListener{
+            timerViewModel.onNextCycle()
         }
 
     }
@@ -180,7 +192,8 @@ class FragmentTimer : Fragment() {
 
         val secondsInString = secondsInMinutesUntilFinished.toString()
 
-        if(timerViewModel.secondsRemaining.value == null || timerViewModel.timerState.value == TimerState.NotStarted){
+        if(timerViewModel.secondsRemaining.value == null || timerViewModel.timerState.value == TimerState.NotStarted
+            || timerViewModel.secondsRemaining.value == 0L){
             binding.textViewCountdown.text = ""
         }
         else binding.textViewCountdown.text = "$minutesUntilFinished:${
@@ -316,10 +329,16 @@ class FragmentTimer : Fragment() {
                 channelId, channelName, NotificationManager.IMPORTANCE_LOW
             )
 
+            val audioAttributes = AudioAttributes.Builder()
+                .setUsage(AudioAttributes.USAGE_NOTIFICATION_RINGTONE)
+                .build()
+
             notificationChannel.enableLights(true)
             notificationChannel.lightColor = Color.RED
             notificationChannel.enableVibration(true)
             notificationChannel.description = getString(R.string.app_name)
+            notificationChannel.importance = NotificationManager.IMPORTANCE_DEFAULT
+            notificationChannel.setSound(Settings.System.DEFAULT_RINGTONE_URI, audioAttributes)
 
             val notificationManager = requireActivity().getSystemService(NotificationManager::class.java)
             notificationManager.createNotificationChannel(notificationChannel)

@@ -1,5 +1,6 @@
 package com.example.pomodorotechnique.screens.history
 
+import android.opengl.Visibility
 import android.os.Bundle
 import android.view.*
 import androidx.databinding.DataBindingUtil
@@ -8,10 +9,10 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.example.pomodorotechnique.R
 import com.example.pomodorotechnique.TimerViewModel
-import com.example.pomodorotechnique.database.Task
 import com.example.pomodorotechnique.database.TasksDatabase
 import com.example.pomodorotechnique.database.TasksDatabaseDao
 import com.example.pomodorotechnique.databinding.FragmentHistoryBinding
+import com.example.pomodorotechnique.models.TimerState
 import com.example.pomodorotechnique.tasks.ViewModelFactory
 import com.google.android.material.tabs.TabLayout
 
@@ -19,9 +20,7 @@ class FragmentHistory : Fragment(), ItemClickListener {
 
 
     private lateinit var binding: FragmentHistoryBinding
-    private lateinit var tasksListContainer: ViewGroup
 
-    private lateinit var currentTask: Task
     private lateinit var datasource: TasksDatabaseDao
 
     private lateinit var timerViewModel: TimerViewModel
@@ -47,6 +46,18 @@ class FragmentHistory : Fragment(), ItemClickListener {
 
         binding.timerViewModel = timerViewModel
         binding.lifecycleOwner = this
+
+        //Observing all tasks, to update the UI clock when the user deletes the last available task
+        timerViewModel.allTasks.observe(viewLifecycleOwner) {
+            if (timerViewModel.allTasks.value!!.isEmpty()) {
+                binding.listEmptyText.setVisibility(View.VISIBLE)
+                binding.deleteAllButton.setVisibility(View.GONE)
+            }
+            else{
+                binding.listEmptyText.setVisibility(View.GONE)
+                binding.deleteAllButton.setVisibility(View.VISIBLE)
+            }
+        }
 
         //Instantiating the Adapter
         val adapter = TasksAdapter(this)
@@ -76,4 +87,6 @@ class FragmentHistory : Fragment(), ItemClickListener {
     override fun deleteClick(taskId: Long) {
         timerViewModel.deleteTask(taskId)
     }
+
+
 }

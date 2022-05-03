@@ -16,4 +16,5 @@
     <string name="notification_channel_name">Timer Done</string>
     <string name="get_started">Get started by creating a new task, \nor select one from history!</string>
     <string name="pomodoro_image_content_description">Tomato icon for each time</string>
+    <string name="clear_all">Clear All</string>
 </resources>

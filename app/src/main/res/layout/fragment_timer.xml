@@ -34,7 +34,7 @@
         android:id="@+id/animationGreen"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteX="16dp"
         tools:layout_editor_absoluteY="0dp" />
 
     <TextView
@@ -69,14 +69,14 @@
         android:background="@color/white"
         android:src="@drawable/ic_baseline_pause_24"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/imageButton3"
+        app:layout_constraintEnd_toStartOf="@+id/buttonNext"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/button_play"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.85" />
 
     <ImageButton
-        android:id="@+id/imageButton3"
+        android:id="@+id/buttonNext"
         android:layout_width="60dp"
         android:layout_height="60dp"
         android:layout_marginEnd="32dp"
