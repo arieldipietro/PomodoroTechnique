@@ -10,6 +10,8 @@ La app tiene animaciones que se pueden ver en las capturas, pero dado que el tie
 
 Está seteado por defecto 25min focus, 5 de descanso, y cada cuatro ciclos el descanso es de 20min. Lo hice de esta manera porque googleé la técnica del pomodoro y si dejaba que el usuario lo setee, perdía un poco su gracia :)
 
+Dejé además que el conteo de bloques sea infinito, y que una persona pueda medir, por ejemplo, el tiempo estudiado en total en una materia en un año
+
 Mientras tanto la app está funcionando bastante dignamente! :)
 
 ![image](https://user-images.githubusercontent.com/40278289/166502445-1f41e70b-2085-4968-b855-ebd181da81cd.png)
