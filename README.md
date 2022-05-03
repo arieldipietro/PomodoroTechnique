@@ -1,6 +1,6 @@
 # PomodoroTechnique
 
-Hola Brais! Soy nuevo en esto y esta es mi primera aplicación 100% hecha por mi! Muchas gracias por la idea!
+Hola Brais! Soy nuevo en esto y esta es mi primera aplicación 100% hecha por mi! Muchas gracias por la idea y los recursos!!!
 
 Llegué a subir todo anoche a las 4 de la mañana, asi que en los próximos días escribiré el readMe y limpiaré un poco el código! 
 
