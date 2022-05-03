@@ -6,6 +6,8 @@ Llegué a subir todo anoche a las 4 de la mañana, asi que en los próximos día
 
 Me falta setear la cantidad de tiempo enfocado en la parte del historial.
 
+En la parte del historial podemos seleccionar un task ya creado y continuarlo.
+
 La app tiene animaciones que se pueden ver en las capturas, pero dado que el tiempo es de 25 minutos no se van a poder apreciar en el vivo.
 
 Está seteado por defecto 25min focus, 5 de descanso, y cada cuatro ciclos el descanso es de 20min. Lo hice de esta manera porque googleé la técnica del pomodoro y si dejaba que el usuario lo setee, perdía un poco su gracia :)
