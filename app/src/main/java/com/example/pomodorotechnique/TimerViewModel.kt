@@ -19,9 +19,9 @@ class TimerViewModel(
 ) : AndroidViewModel(application) {
 
     object Timers {
-        const val INITIAL_FOCUS_TIME = 10 * 1L
-        const val SHORT_REST_TIME = 10 * 1L
-        const val LONG_REST_TIME = 10 * 1L
+        const val INITIAL_FOCUS_TIME = 25 * 60L
+        const val SHORT_REST_TIME = 5 * 60L
+        const val LONG_REST_TIME = 20 * 60L
     }
 
     private lateinit var timerFocus: CountDownTimer
@@ -195,9 +195,9 @@ class TimerViewModel(
 
         } else {
             if (isMultipleOf4(cyclesCount.value!!)) {
-                timerLengthSeconds = Timers.SHORT_REST_TIME
-            } else {
                 timerLengthSeconds = Timers.LONG_REST_TIME
+            } else {
+                timerLengthSeconds = Timers.SHORT_REST_TIME
             }
             _previousTimerState.value = OnFocusRunning
             //TODO: Manage the else case, add different scenarios: focus runningpaused, restpaused
