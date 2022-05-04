@@ -33,6 +33,6 @@ fun TextView.setCyclesComplete(item: Task?) {
 @BindingAdapter("focusedTimeFormated")
 fun TextView.setFocusedTime(item: Task?) {
     item?.let {
-        text = "Total Focused Time: "
+        text = "Total Focused Time: ${item.focusedTime}"
     }
 }

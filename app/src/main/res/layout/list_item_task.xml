@@ -11,9 +11,6 @@
         <variable
             name="clickListener"
             type="com.example.pomodorotechnique.screens.history.ItemClickListener"/>
-        <variable
-            name="timerViewModel"
-            type="com.example.pomodorotechnique.TimerViewModel" />
     </data>
 
         <RelativeLayout
@@ -84,7 +81,7 @@
                 app:cyclesCompletedFormated="@{task}"
                 tools:text="task_completed" />
 
-            <!--<TextView
+            <TextView
                 android:id="@+id/focused_time"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -95,8 +92,7 @@
                 android:paddingEnd="16dp"
                 android:textAppearance="?attr/textAppearanceBody2"
                 app:focusedTimeFormated="@{task}"
-                android:text="Total focused time: @{() -> timerViewModel.updateCurrentTaskPropertiesInDatabase(task)}"
-                tools:text="task_tertiary_text" />-->
+                tools:text="task_tertiary_text" />
 
         </RelativeLayout>
 

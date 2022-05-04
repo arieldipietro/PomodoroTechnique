@@ -72,12 +72,12 @@ class FragmentTimer : Fragment() {
             Log.i("MainActivity", "current task oberver called ONCREATEVIEW")
             Log.i("MainActivity", "current task from observer ONCREATEVIEW :${timerViewModel.currentTask.value}")
             if (timerViewModel.currentTask == null || timerViewModel.currentTask.value!!.name == "FakeTask") {
-                binding.buttonPlay.setVisibility(View.GONE)
-                binding.buttonPause.setVisibility(View.GONE)
+                binding.buttonPlayPause.setVisibility(View.GONE)
+                binding.buttonStop.setVisibility(View.GONE)
                 binding.buttonNext.setVisibility(View.GONE)
             } else {
-                binding.buttonPlay.setVisibility(View.VISIBLE)
-                binding.buttonPause.setVisibility(View.VISIBLE)
+                binding.buttonPlayPause.setVisibility(View.VISIBLE)
+                binding.buttonStop.setVisibility(View.VISIBLE)
                 binding.buttonNext.setVisibility(View.VISIBLE)
             }
             updateUIText()
@@ -101,6 +101,23 @@ class FragmentTimer : Fragment() {
 
         //Observing TimerState, to update the text shown at the top
             timerViewModel.timerState.observe(viewLifecycleOwner) {
+                when(timerViewModel.timerState.value){
+                    TimerState.OnFocusRunning -> {
+                        binding.buttonPlayPause.setImageResource(R.drawable.ic_baseline_pause_circle_outline_24)
+                    }
+                    TimerState.OnRestRunning ->{
+                        binding.buttonPlayPause.setImageResource(R.drawable.ic_baseline_pause_circle_outline_24)
+                    }
+                    TimerState.OnFocusPaused ->{
+                        binding.buttonPlayPause.setImageResource(R.drawable.ic_baseline_play_circle_outline_24)
+                    }
+                    TimerState.OnRestPaused ->{
+                        binding.buttonPlayPause.setImageResource(R.drawable.ic_baseline_play_circle_outline_24)
+                    }
+                    else ->{
+                        binding.buttonPlayPause.setImageResource(R.drawable.ic_baseline_play_circle_outline_24)
+                    }
+                }
                 updateUIText()
                 updateAnimation()
             }
@@ -148,17 +165,23 @@ class FragmentTimer : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.buttonPlay.setOnClickListener{ v ->
+        binding.buttonPlayPause.setOnClickListener{ v ->
             when(timerViewModel.timerState.value){
                 TimerState.NotStarted -> {
                     timerViewModel.startFocusTimer()
                     //Log.i("MainActivity", "secondsRemaining for animation: ${timerViewModel.secondsRemaining.value}")
                 }
-                TimerState.OnFocusRunning -> {}
+                TimerState.OnFocusRunning -> {
+                    timerViewModel.onPause()
+                    updateCountdownUI()
+                }
                 TimerState.OnFocusPaused  -> {
                     timerViewModel.startFocusTimer()
                 }
-                TimerState.OnRestRunning -> {}
+                TimerState.OnRestRunning -> {
+                    timerViewModel.onPause()
+                    updateCountdownUI()
+                }
                 TimerState.OnRestPaused  -> {
                     timerViewModel.startRestTimer()
                 }
@@ -166,14 +189,13 @@ class FragmentTimer : Fragment() {
                     timerViewModel.startFocusTimer()
                 }
             }
-
-
         }
 
-        binding.buttonPause.setOnClickListener{ v ->
-            timerViewModel.onPause()
-            updateCountdownUI()
+        binding.buttonStop.setOnClickListener { v ->
+            timerViewModel.instantiateUI()
+            timerViewModel.cancelTimers()
         }
+
         binding.buttonNext.setOnClickListener{
             timerViewModel.onNextCycle()
         }
@@ -298,6 +320,7 @@ class FragmentTimer : Fragment() {
 
         MaterialAlertDialogBuilder(requireContext())
             .setTitle(R.string.new_task)
+            .setMessage("Set here the new task name")
             .setView(inputTaskName)
             .setPositiveButton(R.string.ok){dialog, switch ->
 

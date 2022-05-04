@@ -31,7 +31,7 @@ data class Task(
     var timerState : TimerState = TimerState.NotStarted,
 
     @ColumnInfo(name = "focused_time")
-    var focusedTime : Long = cyclesCount.toLong() * TimerViewModel.Timers.INITIAL_FOCUS_TIME,
+    var focusedTime : String = ""
 
     )
 

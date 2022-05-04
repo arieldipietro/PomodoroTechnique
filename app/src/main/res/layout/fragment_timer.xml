@@ -34,7 +34,7 @@
         android:id="@+id/animationGreen"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:layout_editor_absoluteX="16dp"
+        tools:layout_editor_absoluteX="0dp"
         tools:layout_editor_absoluteY="0dp" />
 
     <TextView
@@ -50,28 +50,42 @@
         tools:text="Task Title" />
 
     <ImageButton
-        android:id="@+id/button_play"
+        android:id="@+id/button_stop"
         android:layout_width="60dp"
         android:layout_height="60dp"
         android:layout_marginStart="32dp"
         android:background="@color/white"
-        android:src="@drawable/ic_baseline_play_arrow_24"
-        app:layout_constraintEnd_toStartOf="@+id/button_pause"
+        android:src="@drawable/stop_circle_outline"
+        app:layout_constraintBottom_toBottomOf="@+id/button_play"
+        app:layout_constraintEnd_toStartOf="@+id/button_play_pause"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintHorizontal_chainStyle="spread"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/button_pause" />
+        app:layout_constraintTop_toTopOf="@+id/button_play_pause" />
 
-    <ImageButton
-        android:id="@+id/button_pause"
+    <!--<ImageButton
+        android:id="@+id/button_play"
         android:layout_width="60dp"
         android:layout_height="60dp"
-        android:background="@color/white"
-        android:src="@drawable/ic_baseline_pause_24"
+        android:src="@drawable/ic_baseline_play_circle_outline_24"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/buttonNext"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/button_play"
+        app:layout_constraintStart_toEndOf="@+id/button_stop"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.85" />-->
+
+
+    <ImageButton
+        android:id="@+id/button_play_pause"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:background="@color/white"
+        android:src="@drawable/ic_baseline_pause_circle_outline_24"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/buttonNext"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/button_stop"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.85" />
 
@@ -81,11 +95,12 @@
         android:layout_height="60dp"
         android:layout_marginEnd="32dp"
         android:background="@color/white"
-        android:src="@drawable/ic_baseline_skip_next_24"
+        android:src="@drawable/skip_next_circle_outline"
+        app:layout_constraintBottom_toBottomOf="@+id/button_play"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/button_pause"
-        app:layout_constraintTop_toTopOf="@+id/button_pause" />
+        app:layout_constraintStart_toEndOf="@+id/button_play_pause"
+        app:layout_constraintTop_toTopOf="@+id/button_play_pause" />
 
     <TextView
         android:id="@+id/textView_countdown"

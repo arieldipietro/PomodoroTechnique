@@ -19,9 +19,9 @@ class TimerViewModel(
 ) : AndroidViewModel(application) {
 
     object Timers {
-        const val INITIAL_FOCUS_TIME = 25 * 60L
-        const val SHORT_REST_TIME = 5 * 60L
-        const val LONG_REST_TIME = 20 * 60L
+        const val INITIAL_FOCUS_TIME = 25 * 1L
+        const val SHORT_REST_TIME = 5 * 1L
+        const val LONG_REST_TIME = 20 * 1L
     }
 
     private lateinit var timerFocus: CountDownTimer
@@ -109,7 +109,7 @@ class TimerViewModel(
 
     fun instantiateUI() {
         //creating a dummy task to instantiate the UI
-        _currentTask.value = Task(0L, "FakeTask", "", 0L, 0, NotStarted, 0L)
+        _currentTask.value = Task(0L, "FakeTask", "", 0L, 0, NotStarted, "")
         _cyclesCount.value = 0
         _secondsRemaining.value = 0L
         _timerState.value = NotStarted
@@ -181,6 +181,7 @@ class TimerViewModel(
                 lastSavedTimer = secondsRemainingInCountdown
                 _secondsRemaining.value = lastSavedTimer
                 updateCurrentTaskPropertiesInDatabase()
+                setFocusedTimeinDatabase(currentTask.value!!.taskId)
             }
         }.start()
     }
@@ -223,6 +224,7 @@ class TimerViewModel(
                 lastSavedTimer = secondsRemainingInCountdown
                 _secondsRemaining.value = lastSavedTimer
                 updateCurrentTaskPropertiesInDatabase()
+                setFocusedTimeinDatabase(currentTask.value!!.taskId)
 
             }
 
@@ -350,7 +352,7 @@ class TimerViewModel(
         }
     }
 
-    private fun updateFocusedTimeUI(task: Task): String {
+    private fun updateFocusedTimeUI(): String {
         val secondsCompleted = cyclesCount.value!! * Timers.INITIAL_FOCUS_TIME
         val minutesCompleted = secondsCompleted / 60
         val hoursCompleted = minutesCompleted / 60
@@ -376,6 +378,16 @@ class TimerViewModel(
             }"
         }
     }
+
+    private fun setFocusedTimeinDatabase(taskId: Long) {
+        GlobalScope.launch {
+            withContext(Dispatchers.Default) {
+                val currentTask = database.get(taskId)
+                currentTask!!.focusedTime = updateFocusedTimeUI()
+            }
+        }
+    }
+
 }
 
 
