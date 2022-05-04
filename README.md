@@ -1,21 +1,37 @@
 # PomodoroTechnique
 
-Hola Brais! Soy nuevo en esto y esta es mi primera aplicación 100% hecha por mi! Muchas gracias por la idea y los recursos!!!
+# Reason for doing another Pomodor App
 
-Llegué a subir todo anoche a las 4 de la mañana, asi que en los próximos días escribiré el readMe y limpiaré un poco el código! 
+This app was made as part of the MoureDev's (by Brais Moure) community Monthly Challenge (April 22'). Repository can be found here: https://github.com/mouredev/Monthly-App-Challenge-2022
 
-Me falta setear la cantidad de tiempo enfocado en la parte del historial.
-Falta una pantalla de bienvenida/introduccion a como funciona la app.
+# Foundations
 
-En la parte del historial podemos seleccionar un task ya creado y continuarlo.
+Pomodoro technique is a time management method that asks one to alternate pomodoros — focused work sessions — with frequent short breaks to promote sustained concentration and stave off mental fatigue (being "Pomodoro" the italian word for "tomato" -yeah that explains the design!!!)
 
-La app tiene animaciones que se pueden ver en las capturas, pero dado que el tiempo es de 25 minutos no se van a poder apreciar en el vivo.
+1) Pick a task
+2) Set a 25 minutes timer
+3) Work on the task until the time is up
+4) Take a 5 minutes break
+5) Every four ponodoros (por cycles), take a longer break (in this case, the long break is set to 20 minutes.
 
-Está seteado por defecto 25min focus, 5 de descanso, y cada cuatro ciclos el descanso es de 20min. Lo hice de esta manera porque googleé la técnica del pomodoro y si dejaba que el usuario lo setee, perdía un poco su gracia :)
+# Features
 
-Dejé además que el conteo de bloques sea infinito, y que una persona pueda medir, por ejemplo, el tiempo estudiado en total en una materia en un año
+The App uses Views
+Tabbed activity using two fragments
+Custom Views and animations using Canvas objects
+Recycler View list and custom adapters
+Database SQLite for saving the tasks
+Coroutines to write to and read from databases
+Notifications
 
-Mientras tanto la app está funcionando bastante dignamente! :)
+Known issues:
+For some limitations in my designing skills, the app is block to portrait mode screen
+
+Future improvements:
+Soon I'll get the app available in Spanish, since it's my mother language
+I'll implement a short tour when the app is launched for the first time
+
+# Let's have a look!
 
 ![image](https://user-images.githubusercontent.com/40278289/166502445-1f41e70b-2085-4968-b855-ebd181da81cd.png)
 ![image](https://user-images.githubusercontent.com/40278289/166502696-26e84d52-bd47-4866-bc13-4fbeea830c11.png)
