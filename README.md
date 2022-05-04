@@ -12,7 +12,7 @@ Pomodoro technique is a time management method that asks one to alternate pomodo
 2) Set a 25 minutes timer
 3) Work on the task until the time is up
 4) Take a 5 minutes break
-5) Every four ponodoros (por cycles), take a longer break (in this case, the long break is set to 20 minutes.
+5) Every four pomodoros (four cycles), take a longer break (in this case, the long break is set to 20 minutes.
 
 # Features
 
