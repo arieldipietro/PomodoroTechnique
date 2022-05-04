@@ -19,9 +19,9 @@ class TimerViewModel(
 ) : AndroidViewModel(application) {
 
     object Timers {
-        const val INITIAL_FOCUS_TIME = 25 * 1L
-        const val SHORT_REST_TIME = 5 * 1L
-        const val LONG_REST_TIME = 20 * 1L
+        const val INITIAL_FOCUS_TIME = 25 * 60L
+        const val SHORT_REST_TIME = 5 * 60L
+        const val LONG_REST_TIME = 20 * 60L
     }
 
     private lateinit var timerFocus: CountDownTimer
@@ -134,6 +134,7 @@ class TimerViewModel(
                 currentTaskDatabase?.timerState = timerState.value!!
                 currentTaskDatabase?.cyclesCount = cyclesCount.value!!
                 currentTaskDatabase?.secondsRemaining = secondsRemaining.value!!
+                currentTaskDatabase?.focusedTime = updateFocusedTimeUI()
                 database.update(currentTaskDatabase!!)
             }
         }
@@ -181,7 +182,6 @@ class TimerViewModel(
                 lastSavedTimer = secondsRemainingInCountdown
                 _secondsRemaining.value = lastSavedTimer
                 updateCurrentTaskPropertiesInDatabase()
-                setFocusedTimeinDatabase(currentTask.value!!.taskId)
             }
         }.start()
     }
@@ -223,8 +223,9 @@ class TimerViewModel(
                 val secondsRemainingInCountdown = millisUntilFinished / 1000
                 lastSavedTimer = secondsRemainingInCountdown
                 _secondsRemaining.value = lastSavedTimer
+
+                //NO PUEDO UNIR ESTOS DOS EN LA MISMA FUNCION?
                 updateCurrentTaskPropertiesInDatabase()
-                setFocusedTimeinDatabase(currentTask.value!!.taskId)
 
             }
 
@@ -353,8 +354,16 @@ class TimerViewModel(
     }
 
     private fun updateFocusedTimeUI(): String {
-        val secondsCompleted = cyclesCount.value!! * Timers.INITIAL_FOCUS_TIME
-        val minutesCompleted = secondsCompleted / 60
+        val secondsCompleted = cyclesCount.value!! * Timers.INITIAL_FOCUS_TIME.toInt()
+
+        val hours = secondsCompleted / 3600;
+        val minutes = (secondsCompleted % 3600) / 60;
+        //val seconds = secondsCompleted % 60;
+
+        return "$hours hs $minutes mins"
+
+
+        /*val minutesCompleted = secondsCompleted / 60
         val hoursCompleted = minutesCompleted / 60
         val secondsInHoursCompleted =
             secondsCompleted - hoursCompleted * 3600 - minutesCompleted * 60
@@ -368,25 +377,27 @@ class TimerViewModel(
 
         if (hoursCompleted > 0) {
             return "$hoursCompleted:$minutesInHoursCompleted${
-                if (secondsInString.length == 2) secondsInString
-                else "0$secondsInString"
+                if (secondsInString.length == 2) secondsInString+" hours"
+                else "0$secondsInString hours"
             }"
         } else {
             return "$minutesCompleted:${
-                if (secondsInString.length == 2) secondsInString
-                else "0$secondsInString"
+                if (secondsInString.length == 2) secondsInString+" minutes"
+                else "0$secondsInString minutes"
             }"
-        }
+        }*/
     }
 
-    private fun setFocusedTimeinDatabase(taskId: Long) {
+
+    /*private fun setFocusedTimeinDatabase(taskId: Long) {
         GlobalScope.launch {
             withContext(Dispatchers.Default) {
                 val currentTask = database.get(taskId)
                 currentTask!!.focusedTime = updateFocusedTimeUI()
+                _currentTask.value!!.focusedTime = updateFocusedTimeUI()
             }
         }
-    }
+    }*/
 
 }
 
