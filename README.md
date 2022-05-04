@@ -17,11 +17,17 @@ Pomodoro technique is a time management method that asks one to alternate pomodo
 # Features
 
 The App uses Views
+
 Tabbed activity using two fragments
+
 Custom Views and animations using Canvas objects
+
 Recycler View list and custom adapters
+
 Database SQLite for saving the tasks
+
 Coroutines to write to and read from databases
+
 Notifications
 
 Known issues:
@@ -29,6 +35,7 @@ For some limitations in my designing skills, the app is block to portrait mode s
 
 Future improvements:
 Soon I'll get the app available in Spanish, since it's my mother language
+
 I'll implement a short tour when the app is launched for the first time
 
 # Let's have a look!
