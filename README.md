@@ -1,6 +1,6 @@
 # PomodoroTechnique
 
-# Reason for doing another Pomodor App
+# Reason for a Pomodoro App
 
 This app was made as part of the MoureDev's (by Brais Moure) community Monthly Challenge (April 22'). Repository can be found here: https://github.com/mouredev/Monthly-App-Challenge-2022
 
