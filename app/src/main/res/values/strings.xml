@@ -3,7 +3,7 @@
     <string name="tab_text_1">Timer</string>
     <string name="tab_text_2">History</string>
     <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="about_1_text">Pomodoro Technique: \nA simple method to balance focus with deliberate breaks</string>
     <string name="new_task">New Task:</string>
     <string name="ok">OK</string>
     <string name="cancel">CANCEL</string>
@@ -17,4 +17,8 @@
     <string name="get_started">Get started by creating a new task, \nor select one from history!</string>
     <string name="pomodoro_image_content_description">Tomato icon for each time</string>
     <string name="clear_all">Clear All</string>
+    <string name="about_2_text">Pomodoro technique is a time management method that asks you to alternate pomodoros — focused work sessions — with frequent short breaks to promote sustained concentration and stave off mental fatigue (being \"Pomodoro\" the italian word for \"tomato\" -yeah that explains the design!!!)</string>
+    <string name="about_3_text">1) Pick a task\n2) Set a duration for the Focused Timer\n3) Work on the task until the time is up\n4) Take a short break\n5) Every four pomodoros (four cycles), take a longer break</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="ToolbarStyle" parent="Theme.PomodoroTechnique">
+        <item name="android:textColorPrimary">@color/black</item>
+    </style>
+
+    <style name="appBarCustomLayout" parent="Theme.PomodoroTechnique.PopupOverlay">
+        <item name="android:textColorPrimary">@color/white</item>
+        <item name="android:textColorSecondary">@color/white</item>
+        <item name="android:textColor">@color/black</item>
+    </style>`
+
+
+</resources>

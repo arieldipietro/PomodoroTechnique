@@ -1,35 +1,31 @@
 package com.example.pomodorotechnique
 
 import android.app.*
-import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
-import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
-import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.android.material.snackbar.Snackbar
-import com.google.android.material.tabs.TabLayout
-import androidx.viewpager.widget.ViewPager
-import androidx.appcompat.app.AppCompatActivity
 import android.view.Menu
+import android.view.MenuInflater
 import android.view.MenuItem
-import androidx.activity.viewModels
-import androidx.core.app.NotificationCompat
-import androidx.core.content.ContextCompat
-import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModelProvider
+import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AppCompatActivity
+import androidx.navigation.NavController
+import androidx.navigation.Navigation
+import androidx.navigation.findNavController
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.NavigationUI
+import androidx.navigation.ui.navigateUp
+import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.viewpager2.widget.ViewPager2
-import com.example.pomodorotechnique.ui.main.SectionsPagerAdapter
 import com.example.pomodorotechnique.databinding.ActivityMainBinding
-import com.example.pomodorotechnique.models.TimerState
-import com.example.pomodorotechnique.utils.cancelNotifications
-import com.example.pomodorotechnique.utils.sendNotification
+import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
+
 
 class MainActivity : AppCompatActivity() {
 
+    private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,22 +34,48 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val sectionsPagerAdapter = SectionsPagerAdapter(this)
-        val viewPager: ViewPager2 = binding.viewPager
-        viewPager.adapter = sectionsPagerAdapter
-        val tabLayout: TabLayout = binding.tabs
-        TabLayoutMediator(tabLayout, viewPager) { tab, position ->
-            if(position == 0){
-                tab.text = "Timer"
-            }
-            else{
-                tab.text = "History"
-            }
-        }.attach()
+        //removes the up button from tabsContainer Fragment
+        appBarConfiguration = AppBarConfiguration.Builder(R.id.fragmentTabsContainer).build()
 
+        val navController = this.findNavController(R.id.myNavHostFragment)
+        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration)
     }
 
-    override fun onPause() {
-        super.onPause()
+    override fun onSupportNavigateUp(): Boolean {
+        val navController = this.findNavController(R.id.myNavHostFragment)
+        return navController.navigateUp()
+                //|| super.onSupportNavigateUp()
     }
-}
+
+
+    /*override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        menuInflater.inflate(R.menu.overflow_menu, menu)
+        return true
+    }*/
+
+    /*override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        return when (item.itemId) {
+            R.id.navigation_settings -> {
+                val navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main)
+                navController.navigate(R.id.action_FragmentTimer_to_FragmentSettings)
+                true
+            }
+            R.id.navigation_about -> {
+                val navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main)
+                navController.navigate(R.id.action_FragmentTimer_to_FragmentAbout)
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+
+    override fun onSupportNavigateUp(): Boolean {
+        val navController = findNavController(R.id.nav_host_fragment_content_main)
+        return navController.navigateUp(appBarConfiguration)
+                || super.onSupportNavigateUp()
+    }*/
+
+    }

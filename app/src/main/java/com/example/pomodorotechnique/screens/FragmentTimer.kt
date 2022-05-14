@@ -1,12 +1,10 @@
-package com.example.pomodorotechnique
+package com.example.pomodorotechnique.screens
 
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.content.ContentResolver
 import android.graphics.Color
 import android.media.AudioAttributes
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
@@ -19,8 +17,9 @@ import android.widget.EditText
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
+import com.example.pomodorotechnique.R
+import com.example.pomodorotechnique.TimerViewModel
 import com.example.pomodorotechnique.database.TasksDatabase
 import com.example.pomodorotechnique.database.TasksDatabaseDao
 import com.example.pomodorotechnique.databinding.FragmentTimerBinding
@@ -30,10 +29,6 @@ import com.example.pomodorotechnique.utils.cancelNotifications
 import com.example.pomodorotechnique.utils.sendNotification
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlin.concurrent.timer
 
 class FragmentTimer : Fragment() {
 
@@ -322,12 +317,12 @@ class FragmentTimer : Fragment() {
             .setTitle(R.string.new_task)
             .setMessage("Set here the new task name")
             .setView(inputTaskName)
-            .setPositiveButton(R.string.ok){dialog, switch ->
+            .setPositiveButton(R.string.ok){ dialog, switch ->
 
                 timerViewModel.createNewTask(inputTaskName.text.toString())
 
             }
-            .setNegativeButton(R.string.cancel){dialog, switch ->
+            .setNegativeButton(R.string.cancel){ dialog, switch ->
                 //TODO: Implement cancel button
             }
             .show()

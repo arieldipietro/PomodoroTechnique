@@ -77,7 +77,7 @@ class FragmentHistory : Fragment(), ItemClickListener {
 
         timerViewModel.cancelTimers()
 
-        val tabLayout: TabLayout = this.requireActivity().findViewById(R.id.tabs)
+        val tabLayout: TabLayout = this.requireActivity().findViewById(R.id.tabLayout)
         tabLayout.getTabAt(0)?.select()
 
         timerViewModel.setSelectedTaskId(taskId)
