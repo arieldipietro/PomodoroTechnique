@@ -4,7 +4,6 @@ package com.example.pomodorotechnique.ui.main
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.example.pomodorotechnique.screens.FragmentTimer
 import com.example.pomodorotechnique.screens.history.FragmentHistory

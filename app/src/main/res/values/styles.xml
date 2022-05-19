@@ -1,14 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="ToolbarStyle" parent="Theme.PomodoroTechnique">
-        <item name="android:textColorPrimary">@color/black</item>
+
+    `
+
+    <style name="ThemeOverlay.App.MaterialAlertDialog" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
+        <item name="colorPrimary">@color/primaryDarkColor</item>
+        <item name="colorSecondary">@color/primaryDarkColor</item>
+        <!--<item name="colorSurface">@color/primaryLightColor</item>-->
+        <!--<item name="colorOnSurface">@color/primaryColor</item>-->
+        <item name="materialAlertDialogTitleTextStyle">@style/MaterialAlertDialog.App.Title.Text</item>
     </style>
 
-    <style name="appBarCustomLayout" parent="Theme.PomodoroTechnique.PopupOverlay">
-        <item name="android:textColorPrimary">@color/white</item>
-        <item name="android:textColorSecondary">@color/white</item>
+    <style name="MaterialAlertDialog.App.Title.Text" parent="MaterialAlertDialog.MaterialComponents.Title.Text">
         <item name="android:textColor">@color/black</item>
-    </style>`
+    </style>
 
 
 </resources>

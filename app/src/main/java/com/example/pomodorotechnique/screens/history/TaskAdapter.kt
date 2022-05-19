@@ -12,7 +12,7 @@ import com.example.pomodorotechnique.R
 import com.example.pomodorotechnique.database.Task
 import com.example.pomodorotechnique.databinding.ListItemTaskBinding
 
-class TasksAdapter(val itemClickListener: ItemClickListener) : ListAdapter<Task,
+class TasksAdapter(private val itemClickListener: ItemClickListener) : ListAdapter<Task,
         TasksAdapter.ViewHolder>(TasksDiffCallback()), View.OnClickListener {
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {

@@ -14,15 +14,14 @@ class AnimationRed @JvmOverloads constructor(
 ) : View(context, attrs, defStyleAttr) {
 
     private val ovalSpace = RectF()
-    private val bitmapOvalSpace = RectF()
     private var currentPercentage = 0
-    private val percentageToFill = getCurrentPercentageToFill()
+
     //instance of ValueAnimator
     private val valueAnimator = ValueAnimator()
 
     //filling the animated red circle
-    val paintAnimationRed = Paint().apply {
-        setColor(getResources().getColor(R.color.redForAnimation))
+    private val paintAnimationRed = Paint().apply {
+        color = resources.getColor(R.color.redForAnimation)
         isAntiAlias = true // ensure the drawing has smooth edges
         style = Paint.Style.STROKE
         strokeCap = Paint.Cap.ROUND
@@ -64,7 +63,8 @@ class AnimationRed @JvmOverloads constructor(
     fun animateProgress(setDuration: Long) {
         Log.i("MainActivity", "AnimateProgress called")
         //holds animation values from 0 to 100
-        val valuesHolder = PropertyValuesHolder.ofFloat(PERCENTAGE_VALUE_HOLDER, 0f, 100f)
+        //starts on 1f so we can see a bit of the animation from the beginning
+        val valuesHolder = PropertyValuesHolder.ofFloat(PERCENTAGE_VALUE_HOLDER, 1f, 100f)
 
         valueAnimator.apply {
             setValues(valuesHolder)
@@ -84,9 +84,7 @@ class AnimationRed @JvmOverloads constructor(
     fun pauseAnimation(){
         valueAnimator.pause()
     }
-    fun cancelAnimation(){
-        valueAnimator.cancel()
-    }
+
     fun resumeAnimation(){
         valueAnimator.resume()
     }

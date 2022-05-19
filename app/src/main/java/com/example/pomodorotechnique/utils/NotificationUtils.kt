@@ -6,14 +6,15 @@ import android.content.Context
 import android.content.Intent
 import android.media.RingtoneManager
 import android.net.Uri
+import android.os.Build
 import androidx.core.app.NotificationCompat
 import com.example.pomodorotechnique.MainActivity
 import com.example.pomodorotechnique.R
 
 // Notification ID.
-private val NOTIFICATION_ID = 0
-private val REQUEST_CODE = 0
-private val FLAGS = 0
+private const val NOTIFICATION_ID = 0
+private const val REQUEST_CODE = 0
+private const val FLAGS = 0
 
 fun NotificationManager.sendNotification(messageBody: String, applicationContext: Context){
 
@@ -21,9 +22,13 @@ fun NotificationManager.sendNotification(messageBody: String, applicationContext
     val contentIntent = Intent(applicationContext, MainActivity::class.java)
 
     //this to come back to the current Screen when notification is clicked
-    contentIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
+    contentIntent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
 
-    val contentPendingIntent = PendingIntent.getActivity(applicationContext, NOTIFICATION_ID, contentIntent, PendingIntent.FLAG_IMMUTABLE)
+    val contentPendingIntent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        PendingIntent.getActivity(applicationContext, NOTIFICATION_ID, contentIntent, PendingIntent.FLAG_IMMUTABLE)
+    } else {
+        TODO("VERSION.SDK_INT < M")
+    }
 
     val alarmSound : Uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
 

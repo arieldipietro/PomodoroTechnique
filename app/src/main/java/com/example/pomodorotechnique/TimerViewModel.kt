@@ -3,14 +3,16 @@ package com.example.pomodorotechnique
 import android.app.Application
 import android.os.CountDownTimer
 import android.util.Log
-import androidx.lifecycle.*
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.example.pomodorotechnique.database.Task
 import com.example.pomodorotechnique.database.TasksDatabaseDao
 import com.example.pomodorotechnique.models.TimerState
 import com.example.pomodorotechnique.models.TimerState.*
 import kotlinx.coroutines.*
 import java.util.*
-import kotlin.concurrent.timer
 
 
 class TimerViewModel(
@@ -18,12 +20,12 @@ class TimerViewModel(
     application: Application
 ) : AndroidViewModel(application) {
 
-    object Timers {
+ /*   object Timers {
         const val INITIAL_FOCUS_TIME = 25 * 60L
         const val SHORT_REST_TIME = 5 * 60L
         const val LONG_REST_TIME = 20 * 60L
     }
-
+*/
     private lateinit var timerFocus: CountDownTimer
     private lateinit var timerRest: CountDownTimer
 
@@ -55,7 +57,7 @@ class TimerViewModel(
     private val _cyclesCount = MutableLiveData<Int>()
     val cyclesCount: LiveData<Int> get() = _cyclesCount
 
-    fun getCurrentTaskFromDatabase() {
+    private fun getCurrentTaskFromDatabase() {
         Log.i("Mainctivity", "getCurrentTaskFromDatabase")
         GlobalScope.launch { // creates worker thread
             //Since we need to update UI from the coroutine, we should execute it on the main context
@@ -115,7 +117,7 @@ class TimerViewModel(
         _timerState.value = NotStarted
     }
 
-    fun updateLiveData() {
+    private fun updateLiveData() {
         viewModelScope.launch { // creates worker thread
             _cyclesCount.value = currentTask.value!!.cyclesCount
             _secondsRemaining.value = 0L
@@ -145,11 +147,11 @@ class TimerViewModel(
         Log.i("MainActivity", "cycles Count in startFocus: ${cyclesCount.value}")
         when (timerState.value) {
             NotStarted -> {
-                timerLengthSeconds = Timers.INITIAL_FOCUS_TIME
+                timerLengthSeconds = currentTask.value!!.timerLength
                 _previousTimerState.value = NotStarted
             }
             RestCompleted -> {
-                timerLengthSeconds = Timers.INITIAL_FOCUS_TIME
+                timerLengthSeconds = currentTask.value!!.timerLength
                 _previousTimerState.value = RestCompleted
             }
             else -> {
@@ -170,7 +172,7 @@ class TimerViewModel(
 
         timerFocus = object : CountDownTimer(timerLengthSeconds * 1000, 1000) {
             override fun onFinish() {
-                _timerState.value = TimerState.Completed
+                _timerState.value = Completed
                 _cyclesCount.value = cyclesCount.value!! + 1
                 updateCurrentTaskPropertiesInDatabase()
                 timerFocus.cancel()
@@ -195,10 +197,10 @@ class TimerViewModel(
                 when we restart the timer.*/
 
         } else {
-            if (isMultipleOf4(cyclesCount.value!!)) {
-                timerLengthSeconds = Timers.LONG_REST_TIME
+            timerLengthSeconds = if (isMultipleOf4(cyclesCount.value!!)) {
+                currentTask.value!!.longBreakLength
             } else {
-                timerLengthSeconds = Timers.SHORT_REST_TIME
+                currentTask.value!!.shortBreakLength
             }
             _previousTimerState.value = OnFocusRunning
             //TODO: Manage the else case, add different scenarios: focus runningpaused, restpaused
@@ -271,7 +273,7 @@ class TimerViewModel(
         }
     }
 
-    fun onResume(taskId: Long) {
+    private fun onResume(taskId: Long) {
 
         //CUANDO NO LO PAUSO, NO CAMBIA EL LIVE DATA
         viewModelScope.launch {
@@ -281,7 +283,7 @@ class TimerViewModel(
             _cyclesCount.postValue(task.cyclesCount)
 
             when (task.timerState) {
-                TimerState.OnFocusRunning -> {
+                OnFocusRunning -> {
                     _timerState.postValue(NotStarted)
                     _previousTimerState.postValue(NotStarted)
                     /*when the user STOPS the focus running, it means they haven't finished the focus time
@@ -292,7 +294,7 @@ class TimerViewModel(
                         _cyclesCount.postValue(1)
                     }
                 }
-                TimerState.OnRestRunning -> {
+                OnRestRunning -> {
                     _cyclesCount.postValue(cyclesCount.value!!)
                     _timerState.postValue(RestCompleted)
                 }
@@ -306,15 +308,11 @@ class TimerViewModel(
         }
     }
 
-    fun isMultipleOf4(cycles: Int): Boolean {
-        if (cycles.toFloat() % 4 == 0F) {
-            return true
-        } else {
-            return false
-        }
+    private fun isMultipleOf4(cycles: Int): Boolean {
+        return cycles.toFloat() % 4 == 0F
     }
 
-    fun createNewTask(name: String) {
+    fun createNewTask(name: String, timerLength: Int, shortBreakLength: Int, longBreakLength: Int) {
         cancelTimers()
         _timerState.value = NotStarted
         val newTask = Task()
@@ -328,6 +326,10 @@ class TimerViewModel(
 
             newTask.dateCreated = "$day/$month/$year"
 
+            newTask.timerLength = timerLength * 60L
+            newTask.shortBreakLength = shortBreakLength * 60L
+            newTask.longBreakLength = longBreakLength * 60L
+
             insert(newTask)
             Log.i("MainActivity", "after Insert New Task")
             //Log.i("Main Activity", "task created: ${newTask}")
@@ -337,13 +339,14 @@ class TimerViewModel(
         }
     }
 
-    suspend fun insert(task: Task) {
+    private suspend fun insert(task: Task) {
         database.insert(task)
     }
 
     fun deleteTask(taskId: Long) {
         viewModelScope.launch {
             database.deleteTask(taskId)
+            instantiateUI()
         }
     }
 
@@ -351,54 +354,19 @@ class TimerViewModel(
         viewModelScope.launch {
             database.clear()
         }
+        instantiateUI()
     }
 
     private fun updateFocusedTimeUI(): String {
-        val secondsCompleted = cyclesCount.value!! * Timers.INITIAL_FOCUS_TIME.toInt()
+        val secondsCompleted = cyclesCount.value!! * (currentTask.value!!.timerLength.toInt())
 
-        val hours = secondsCompleted / 3600;
-        val minutes = (secondsCompleted % 3600) / 60;
+        val hours = secondsCompleted / 3600
+        val minutes = (secondsCompleted % 3600) / 60
         //val seconds = secondsCompleted % 60;
 
         return "$hours hs $minutes mins"
 
-
-        /*val minutesCompleted = secondsCompleted / 60
-        val hoursCompleted = minutesCompleted / 60
-        val secondsInHoursCompleted =
-            secondsCompleted - hoursCompleted * 3600 - minutesCompleted * 60
-        val secondsInHoursCompletedString = secondsInHoursCompleted.toString()
-
-        val minutesInHoursCompleted = (secondsCompleted - hoursCompleted * 3600) * 60
-        val minutesInHoursCompletedString = minutesInHoursCompleted.toString()
-
-        val secondsInMinutesCompleted = secondsCompleted - minutesCompleted * 60
-        val secondsInString = secondsInMinutesCompleted.toString()
-
-        if (hoursCompleted > 0) {
-            return "$hoursCompleted:$minutesInHoursCompleted${
-                if (secondsInString.length == 2) secondsInString+" hours"
-                else "0$secondsInString hours"
-            }"
-        } else {
-            return "$minutesCompleted:${
-                if (secondsInString.length == 2) secondsInString+" minutes"
-                else "0$secondsInString minutes"
-            }"
-        }*/
     }
-
-
-    /*private fun setFocusedTimeinDatabase(taskId: Long) {
-        GlobalScope.launch {
-            withContext(Dispatchers.Default) {
-                val currentTask = database.get(taskId)
-                currentTask!!.focusedTime = updateFocusedTimeUI()
-                _currentTask.value!!.focusedTime = updateFocusedTimeUI()
-            }
-        }
-    }*/
-
 }
 
 

@@ -46,7 +46,7 @@ interface TasksDatabaseDao {
      *
      * sorted by Id in descending order.
      */
-    @Query("SELECT * FROM tasks_history_table ORDER BY date_created DESC")
+    @Query("SELECT * FROM tasks_history_table ORDER BY taskId DESC")
     fun getAllTasks(): LiveData<List<Task>>
 
     /**

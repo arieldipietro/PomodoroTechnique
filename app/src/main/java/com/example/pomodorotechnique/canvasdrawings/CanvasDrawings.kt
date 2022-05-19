@@ -12,6 +12,7 @@ class   CanvasDrawings @JvmOverloads constructor(
 
     private val ovalSpace = RectF()
     private val bitmapOvalSpace = RectF()
+    val bitmap : Bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.tomato)
 
 
     override fun onDraw(canvas: Canvas?) {
@@ -20,11 +21,11 @@ class   CanvasDrawings @JvmOverloads constructor(
 
         //filling the inner circle
         val paintInnerCircle = Paint()
-        paintInnerCircle.setColor(getResources().getColor(R.color.secondaryColor))
+        paintInnerCircle.color = resources.getColor(R.color.secondaryColor)
         paintInnerCircle.isAntiAlias = true // ensure the drawing has smooth edges
 
         //drawing the tomato image
-        val bitmap : Bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.tomato)
+        //val bitmap : Bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.tomato)
         canvas?.drawBitmap(bitmap, null, bitmapOvalSpace, null)
         //drawing the inner circle
         canvas?.drawArc(ovalSpace, 0f, 360f, false, paintInnerCircle)

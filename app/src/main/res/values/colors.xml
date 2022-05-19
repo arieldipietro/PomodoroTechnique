@@ -5,11 +5,9 @@
     <color name="primaryDarkColor">#960027</color>
     <color name="redForAnimation">#90960027</color>
     <color name="secondaryColor">#f5e0cd</color>
-    <color name="colorPrimaryVariant">#960027</color>
     <color name="secondaryDarkColor">#c2ae9c</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="filling_color">#F5E0CD</color>
     <color name="secondaryLightColor">#ffffff</color>
     <color name="greenForAnimation">#9082c472</color>
 </resources>

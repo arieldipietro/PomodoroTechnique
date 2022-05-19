@@ -29,6 +29,7 @@ import com.example.pomodorotechnique.utils.cancelNotifications
 import com.example.pomodorotechnique.utils.sendNotification
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.snackbar.Snackbar
 
 class FragmentTimer : Fragment() {
 
@@ -67,13 +68,13 @@ class FragmentTimer : Fragment() {
             Log.i("MainActivity", "current task oberver called ONCREATEVIEW")
             Log.i("MainActivity", "current task from observer ONCREATEVIEW :${timerViewModel.currentTask.value}")
             if (timerViewModel.currentTask == null || timerViewModel.currentTask.value!!.name == "FakeTask") {
-                binding.buttonPlayPause.setVisibility(View.GONE)
-                binding.buttonStop.setVisibility(View.GONE)
-                binding.buttonNext.setVisibility(View.GONE)
+                binding.buttonPlayPause.visibility = View.GONE
+                binding.buttonStop.visibility = View.GONE
+                binding.buttonNext.visibility = View.GONE
             } else {
-                binding.buttonPlayPause.setVisibility(View.VISIBLE)
-                binding.buttonStop.setVisibility(View.VISIBLE)
-                binding.buttonNext.setVisibility(View.VISIBLE)
+                binding.buttonPlayPause.visibility = View.VISIBLE
+                binding.buttonStop.visibility = View.VISIBLE
+                binding.buttonNext.visibility = View.VISIBLE
             }
             updateUIText()
             updateCountdownUI()
@@ -137,16 +138,16 @@ class FragmentTimer : Fragment() {
             getString(R.string.notification_channel_name)
         )
 
-        timerViewModel.timerState.observe(viewLifecycleOwner, {
-            if(timerViewModel.timerState.value == TimerState.Completed) {
+        timerViewModel.timerState.observe(viewLifecycleOwner) {
+            if (timerViewModel.timerState.value == TimerState.Completed) {
                 //Log.i("MainActivity", "Should send Notification")
                 onTimerCompleted("Timer Done, take a Rest!")
             }
-            if(timerViewModel.timerState.value == TimerState.RestCompleted) {
+            if (timerViewModel.timerState.value == TimerState.RestCompleted) {
                 //Log.i("MainActivity", "Should send Notification")
                 onTimerCompleted("Timer Done, back to work!")
             }
-        })
+        }
 
         /*End of Notifications*/
 
@@ -224,10 +225,10 @@ class FragmentTimer : Fragment() {
             timerViewModel.currentTask.value!!.name == "FakeTask"
         ) {
             binding.textViewState.text = getString(R.string.get_started)
-            binding.taskTitle.setVisibility(View.GONE)
+            binding.taskTitle.visibility = View.GONE
         } else {
-            binding.taskTitle.setVisibility(View.VISIBLE)
-            binding.taskTitle.text = "${timerViewModel.currentTask.value!!.name}"
+            binding.taskTitle.visibility = View.VISIBLE
+            binding.taskTitle.text = timerViewModel.currentTask.value!!.name
             val stateString: String =
                 when (timerViewModel.timerState.value) {
                     TimerState.OnFocusRunning -> "Stay Focused!"
@@ -246,16 +247,17 @@ class FragmentTimer : Fragment() {
                     when (timerViewModel.timerState.value) {
                         TimerState.OnRestRunning -> {
                             cyclesString = timerViewModel.cyclesCount.value!!.toString()
-                            binding.textViewState.text = "Cycle: $cyclesString - $stateString"
+                            binding.textViewState.text = getString(R.string.update_ui_cyles_string, cyclesString, stateString)
                         }
                         TimerState.OnRestPaused -> {
                             cyclesString = timerViewModel.cyclesCount.value!!.toString()
-                            binding.textViewState.text = "Cycle: $cyclesString - $stateString"
+                            binding.textViewState.text = getString(R.string.update_ui_cyles_string, cyclesString, stateString)
                         }
                         else -> {
                             cyclesString = (timerViewModel.cyclesCount.value!! + 1).toString()
-                            binding.textViewState.text = "Cycle: $cyclesString - $stateString"
+                            binding.textViewState.text = getString(R.string.update_ui_cyles_string, cyclesString, stateString)
                         }
+
                     }
             }
         }
@@ -266,8 +268,8 @@ class FragmentTimer : Fragment() {
     private fun updateAnimation(){
         when(timerViewModel.timerState.value){
             TimerState.OnFocusRunning -> {
-                binding.animationGreen.setVisibility(View.GONE)
-                binding.animationRed.setVisibility(View.VISIBLE)
+                binding.animationGreen.visibility = View.GONE
+                binding.animationRed.visibility = View.VISIBLE
 
                 if(timerViewModel.previousTimerState.value == TimerState.NotStarted) {
                     binding.animationRed.animateProgress(timerViewModel.secondsRemaining.value!! * 1000L)
@@ -283,13 +285,13 @@ class FragmentTimer : Fragment() {
                 }
             }
             TimerState.OnFocusPaused  -> {
-                binding.animationGreen.setVisibility(View.GONE)
-                binding.animationRed.setVisibility(View.VISIBLE)
+                binding.animationGreen.visibility = View.GONE
+                binding.animationRed.visibility = View.VISIBLE
                 binding.animationRed.pauseAnimation()
             }
             TimerState.OnRestRunning -> {
-                binding.animationGreen.setVisibility(View.VISIBLE)
-                binding.animationRed.setVisibility(View.GONE)
+                binding.animationGreen.visibility = View.VISIBLE
+                binding.animationRed.visibility = View.GONE
                 if(timerViewModel.previousTimerState.value == TimerState.OnFocusRunning) {
                     binding.animationGreen.animateProgress(timerViewModel.secondsRemaining.value!! * 1000L)
                 }
@@ -298,29 +300,107 @@ class FragmentTimer : Fragment() {
                 }
             }
             TimerState.OnRestPaused  -> {
-                binding.animationGreen.setVisibility(View.VISIBLE)
-                binding.animationRed.setVisibility(View.GONE)
+                binding.animationGreen.visibility = View.VISIBLE
+                binding.animationRed.visibility = View.GONE
                 binding.animationGreen.pauseAnimation()
             }
             else -> {
-                binding.animationGreen.setVisibility(View.GONE)
-                binding.animationRed.setVisibility(View.GONE)
+                binding.animationGreen.visibility = View.GONE
+                binding.animationRed.visibility = View.GONE
             }
         }
     }
 
-    fun showAlertDialog(){
+    private fun showAlertDialog(){
         val inputTaskName = EditText(context)
-        inputTaskName.setInputType(InputType.TYPE_CLASS_TEXT)
+        inputTaskName.inputType = InputType.TYPE_CLASS_TEXT
 
         MaterialAlertDialogBuilder(requireContext())
             .setTitle(R.string.new_task)
             .setMessage("Set here the new task name")
             .setView(inputTaskName)
+
+            .setPositiveButton(R.string.next){ dialog, switch ->
+                val taskName = inputTaskName.text.toString()
+ /*               if(taskName == ""){
+                    Snackbar.make(binding.root, "Please define a name for the Task", Snackbar.LENGTH_SHORT).show()
+                }
+                else {*/
+                    showAlertDialog2(taskName)
+            }
+            .setNegativeButton(R.string.cancel){ dialog, switch ->
+                //TODO: Implement cancel button
+            }
+            .show()
+    }
+
+    private fun showAlertDialog2(taskName: String){
+        var selectedTimerIndex = 1
+        val timers = arrayOf("20", "25", "30")
+        var selectedTimer = timers[selectedTimerIndex]
+
+        MaterialAlertDialogBuilder(requireContext(), R.style.ThemeOverlay_App_MaterialAlertDialog )
+            .setTitle("Set the Timer length")
+            .setSingleChoiceItems(timers, selectedTimerIndex) { dialog, which ->
+                selectedTimerIndex = which
+                selectedTimer = timers[which]
+            }
+            .setPositiveButton(R.string.next){ dialog, switch ->
+                val selectedItemInt = selectedTimer.toInt()
+                showAlertDialog3(taskName, selectedItemInt)
+            }
+            .setNeutralButton(R.string.back){ dialog, switch ->
+                showAlertDialog()
+            }
+            .setNegativeButton(R.string.cancel){ dialog, switch ->
+                //TODO: Implement cancel button
+            }
+
+            .show()
+    }
+
+    private fun showAlertDialog3(taskName: String, timerLength: Int){
+        var selectedTimerIndex = 0
+        val timers = arrayOf("5", "10", "15")
+        var selectedTimer = timers[selectedTimerIndex]
+
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Set the Short Break length")
+            .setSingleChoiceItems(timers, selectedTimerIndex) { dialog, which ->
+                selectedTimerIndex = which
+                selectedTimer = timers[which]
+            }
+            .setPositiveButton(R.string.next){ dialog, switch ->
+                val selectedItemInt = selectedTimer.toInt()
+                showAlertDialog4(taskName, timerLength, selectedItemInt)
+            }
+            .setNeutralButton(R.string.back){ dialog, switch ->
+                showAlertDialog2(taskName)
+            }
+            .setNegativeButton(R.string.cancel){ dialog, switch ->
+                //TODO: Implement cancel button
+            }
+
+            .show()
+    }
+
+    private fun showAlertDialog4(taskName: String, timerLength: Int, shortBreakLength: Int){
+        var selectedTimerIndex = 0
+        val timers = arrayOf("20", "25", "30")
+        var selectedTimer = timers[selectedTimerIndex]
+
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Set the Long Break length")
+            .setSingleChoiceItems(timers, selectedTimerIndex) { dialog, which ->
+                selectedTimerIndex = which
+                selectedTimer = timers[which]
+            }
             .setPositiveButton(R.string.ok){ dialog, switch ->
-
-                timerViewModel.createNewTask(inputTaskName.text.toString())
-
+                val selectedItemInt = selectedTimer.toInt()
+                timerViewModel.createNewTask(taskName, timerLength, shortBreakLength, selectedItemInt)
+            }
+            .setNeutralButton(R.string.back){ dialog, switch ->
+                showAlertDialog3(taskName, timerLength)
             }
             .setNegativeButton(R.string.cancel){ dialog, switch ->
                 //TODO: Implement cancel button

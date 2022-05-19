@@ -1,13 +1,9 @@
 package com.example.pomodorotechnique.screens.history
 
-import android.app.Application
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
-import androidx.lifecycle.ViewModelProvider
-import com.example.pomodorotechnique.TimerViewModel
+import com.example.pomodorotechnique.R
 import com.example.pomodorotechnique.database.Task
-import com.example.pomodorotechnique.database.TasksDatabase
-import com.example.pomodorotechnique.tasks.ViewModelFactory
 
 @BindingAdapter("nameAdapter")
 fun TextView.setName(item: Task?) {
@@ -19,20 +15,20 @@ fun TextView.setName(item: Task?) {
 @BindingAdapter("dateCreatedFormated")
 fun TextView.setDateCreatedString(item: Task?) {
     item?.let {
-        text = "Date Created: ${item.dateCreated}"
+        text = resources.getString(R.string.date_created_string, item.dateCreated)
     }
 }
 
 @BindingAdapter("cyclesCompletedFormated")
 fun TextView.setCyclesComplete(item: Task?) {
     item?.let {
-        text = "Cycles Completed: ${item.cyclesCount}"
+        text = resources.getString(R.string.cycles_completed_string, item.cyclesCount)
     }
 }
 
 @BindingAdapter("focusedTimeFormated")
 fun TextView.setFocusedTime(item: Task?) {
     item?.let {
-        text = "Total Focused Time: ${item.focusedTime}"
+        text = resources.getString(R.string.focused_time_string, item.focusedTime)
     }
 }

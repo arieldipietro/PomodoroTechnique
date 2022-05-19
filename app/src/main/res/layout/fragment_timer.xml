@@ -11,6 +11,7 @@
     </data>
 
 <androidx.constraintlayout.widget.ConstraintLayout
+    android:id="@+id/fragmentTimerConstraintLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:ignore="MissingPrefix">
@@ -51,6 +52,7 @@
 
     <ImageButton
         android:id="@+id/button_stop"
+        android:contentDescription="@string/button_stop"
         android:layout_width="60dp"
         android:layout_height="60dp"
         android:layout_marginStart="32dp"
@@ -62,19 +64,6 @@
         app:layout_constraintHorizontal_chainStyle="spread"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/button_play_pause" />
-
-    <!--<ImageButton
-        android:id="@+id/button_play"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:src="@drawable/ic_baseline_play_circle_outline_24"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/buttonNext"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/button_stop"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.85" />-->
-
 
     <ImageButton
         android:id="@+id/button_play_pause"
@@ -91,6 +80,7 @@
 
     <ImageButton
         android:id="@+id/buttonNext"
+        android:contentDescription="@string/button_next"
         android:layout_width="60dp"
         android:layout_height="60dp"
         android:layout_marginEnd="32dp"

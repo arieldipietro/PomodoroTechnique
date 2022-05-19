@@ -1,18 +1,17 @@
 package com.example.pomodorotechnique.screens.history
 
-import android.opengl.Visibility
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.example.pomodorotechnique.R
 import com.example.pomodorotechnique.TimerViewModel
 import com.example.pomodorotechnique.database.TasksDatabase
 import com.example.pomodorotechnique.database.TasksDatabaseDao
 import com.example.pomodorotechnique.databinding.FragmentHistoryBinding
-import com.example.pomodorotechnique.models.TimerState
 import com.example.pomodorotechnique.tasks.ViewModelFactory
 import com.google.android.material.tabs.TabLayout
 
@@ -28,7 +27,7 @@ class FragmentHistory : Fragment(), ItemClickListener {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
 
         binding = DataBindingUtil.inflate(
             inflater,
@@ -50,12 +49,12 @@ class FragmentHistory : Fragment(), ItemClickListener {
         //Observing all tasks, to update the UI clock when the user deletes the last available task
         timerViewModel.allTasks.observe(viewLifecycleOwner) {
             if (timerViewModel.allTasks.value!!.isEmpty()) {
-                binding.listEmptyText.setVisibility(View.VISIBLE)
-                binding.deleteAllButton.setVisibility(View.GONE)
+                binding.listEmptyText.visibility = View.VISIBLE
+                binding.deleteAllButton.visibility = View.GONE
             }
             else{
-                binding.listEmptyText.setVisibility(View.GONE)
-                binding.deleteAllButton.setVisibility(View.VISIBLE)
+                binding.listEmptyText.visibility = View.GONE
+                binding.deleteAllButton.visibility = View.VISIBLE
             }
         }
 
@@ -64,7 +63,7 @@ class FragmentHistory : Fragment(), ItemClickListener {
         binding.tasksList.adapter = adapter
 
         //binding elements in the database to the UI
-        timerViewModel.allTasks.observe(viewLifecycleOwner, Observer {
+        timerViewModel.allTasks.observe(viewLifecycleOwner, {
             it?.let {
                 adapter.submitList(it)
             }

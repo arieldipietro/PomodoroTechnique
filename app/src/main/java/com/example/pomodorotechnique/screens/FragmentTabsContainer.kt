@@ -4,9 +4,7 @@ import android.os.Bundle
 import android.view.*
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
-import com.example.pomodorotechnique.MainActivity
 import com.example.pomodorotechnique.R
 import com.example.pomodorotechnique.databinding.FragmentTabsContainerBinding
 import com.example.pomodorotechnique.ui.main.ViewPagerAdapter
@@ -20,7 +18,7 @@ class FragmentTabsContainer : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
 
         binding = DataBindingUtil.inflate(
             inflater,
@@ -56,7 +54,7 @@ class FragmentTabsContainer : Fragment() {
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
-        inflater?.inflate(R.menu.overflow_menu, menu)
+        inflater.inflate(R.menu.overflow_menu, menu)
     }
 
 override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -64,10 +62,10 @@ override fun onOptionsItemSelected(item: MenuItem): Boolean {
     // automatically handle clicks on the Home/Up button, so long
     // as you specify a parent activity in AndroidManifest.xml.
     return when (item.itemId) {
-        R.id.navigation_settings -> {
+/*        R.id.navigation_settings -> {
             findNavController().navigate(R.id.action_fragmentTabsContainer_to_navigation_settings)
             true
-        }
+        }*/
         R.id.navigation_about -> {
             findNavController().navigate(R.id.action_fragmentTabsContainer_to_navigation_about)
             true
